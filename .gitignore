@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# CUDA build
+*.o
+*.ptx
+*.cubin
+
+# Notebooks
+.ipynb_checkpoints/
+
+CLAUDE.md
+
+# Run artifacts (large or per-pod)
+runs/
+train/runs/
+wandb/
+*.bin
+*.safetensors
+*.pt
+*.ckpt
+/data/
+/workspace/
+.cache/
+
+# Plots are small but generated; keep figures committed for the writeup
+# (writeup/figures/ stays tracked)
+
+# Profiles
+*.ncu-rep
+*.nsys-rep
+*.qdrep
+
+# Large run artifacts (model_final.pt is ~1.3 GB; perplexity etc. lives in writeup/figures/data/)
+runs/

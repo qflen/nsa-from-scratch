@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nsa-from-scratch"
+version = "0.0.1"
+description = "Reimplementation of Native Sparse Attention (arXiv 2502.11089)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "qflen"}]
+dependencies = []
+
+[tool.setuptools.packages.find]
+include = ["nsa*"]
