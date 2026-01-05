@@ -1,0 +1,41 @@
+# Sanity run for NSA-100M: same architecture as the 32k run but at 8k
+# context and 8M tokens so it finishes on a 24 GB card in a few
+# minutes. Use to validate the training loop, optimizer state, LR
+# schedule, wandb wiring, and dataloader end to end.
+run_id: nsa-100m-sanity-8k
+out_dir: /workspace/runs
+tokenizer: huggyllama/llama-7b
+
+arch:
+  vocab_size: 32000
+  n_layers: 12
+  n_heads: 12
+  head_dim: 64
+  hidden_size: 768
+  intermediate_size: 2048
+  max_position_embeddings: 8192
+  rope_theta: 10000.0
+  rms_norm_eps: 1.0e-5
+  tied_embeddings: true
+  attention: nsa
+  nsa_block_size_c: 64
+  nsa_block_size_n: 64
+  nsa_block_size_m: 64
+  nsa_top_k: 16
+  nsa_window_size: 512
+  nsa_pool: mean
+  nsa_gate_activation: sigmoid
+  nsa_use_compressed_as_scorer: true
+
+seq_len: 8192
+micro_batch: 1
+grad_accum: 1
+total_tokens: 8_192_000
+warmup_steps: 100
+peak_lr: 3.0e-4
+floor_lr: 3.0e-5
+weight_decay: 0.1
+log_every: 10
+save_every: 1000
+wandb: true
+tags: [nsa, sanity, 100m, 8k]

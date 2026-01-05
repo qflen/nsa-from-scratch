@@ -1,0 +1,30 @@
+# Dense-100M baseline. Identical recipe to nsa-100m, full attention via SDPA.
+run_id: dense-100m-1b-8k
+out_dir: /workspace/runs
+tokenizer: huggyllama/llama-7b
+
+arch:
+  vocab_size: 32000
+  n_layers: 12
+  n_heads: 12
+  head_dim: 64
+  hidden_size: 768
+  intermediate_size: 2048
+  max_position_embeddings: 8192
+  rope_theta: 10000.0
+  rms_norm_eps: 1.0e-5
+  tied_embeddings: true
+  attention: dense
+
+seq_len: 8192
+micro_batch: 1
+grad_accum: 32
+total_tokens: 1_000_000_000
+warmup_steps: 200
+peak_lr: 3.0e-4
+floor_lr: 3.0e-5
+weight_decay: 0.1
+log_every: 10
+save_every: 2000
+wandb: true
+tags: [dense, 100m, 8k]
