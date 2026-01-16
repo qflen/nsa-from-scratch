@@ -17,6 +17,7 @@ def _extension():
         name="nsa_cuda_selected",
         sources=[
             os.path.join(HERE, "selected_fwd.cu"),
+            os.path.join(HERE, "selected_bwd.cu"),
             os.path.join(HERE, "bindings.cpp"),
         ],
         extra_compile_args={

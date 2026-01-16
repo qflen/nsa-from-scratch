@@ -47,10 +47,9 @@ def sweep(impls: list[str], precisions: list[str], seq_lens: list[int], head_dim
                 elif impl == "nsa_triton":
                     from nsa.triton.forward import nsa_forward  # imported lazily, may not yet exist
                     out = nsa_forward(Q, K, V, cfg)
-                elif impl == "nsa_cuda":
-                    from nsa.cuda import nsa_cuda_forward
-                    out = nsa_cuda_forward(Q, K, V, cfg)
                 else:
+                    # No full-NSA CUDA forward exists (only the selected branch is
+                    # ported to CUDA); see tests/test_cuda_selected.py for its correctness.
                     raise ValueError(impl)
                 rel = _max_rel(out, ref)
                 rows.append({"impl": impl, "precision": prec, "seq_len": T, "max_rel_err": rel})
