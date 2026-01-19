@@ -1,0 +1,43 @@
+# NSA-100M at 64k context, 500M tokens (long-context training demo).
+# Same architecture as config_100m. Doubles the training context from 32k to
+# 64k. grad_accum drops from 8 to 4 to keep effective batch ~256k tokens/step
+# while halving the step count vs the 32k recipe. The dense baseline cannot
+# match this even at 100M parameters on A100 PCIe, 80 GB (OOMs past 32k at this batch
+# shape); the asymmetry is the point.
+run_id: nsa-100m-500m-64k
+out_dir: /workspace/runs
+tokenizer: huggyllama/llama-7b
+
+arch:
+  vocab_size: 32000
+  n_layers: 12
+  n_heads: 12
+  head_dim: 64
+  hidden_size: 768
+  intermediate_size: 2048
+  max_position_embeddings: 65536
+  rope_theta: 10000.0
+  rms_norm_eps: 1.0e-5
+  tied_embeddings: true
+  attention: nsa
+  nsa_block_size_c: 64
+  nsa_block_size_n: 64
+  nsa_block_size_m: 64
+  nsa_top_k: 16
+  nsa_window_size: 512
+  nsa_pool: mean
+  nsa_gate_activation: sigmoid
+  nsa_use_compressed_as_scorer: true
+
+seq_len: 65536
+micro_batch: 1
+grad_accum: 4
+total_tokens: 500_000_000
+warmup_steps: 200
+peak_lr: 3.0e-4
+floor_lr: 3.0e-5
+weight_decay: 0.1
+log_every: 10
+save_every: 2000
+wandb: true
+tags: [nsa, 100m, 64k, long-context]
