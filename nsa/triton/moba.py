@@ -23,9 +23,13 @@ def _per_query_top_k_indices(
     """Compute MoBA's per-query top-k block selection, then aggregate to
     per-query-block indices for the kernel.
 
-    Returns [B, H, n_q_blocks, k_actual] int32 indices where k_actual is
-    the deduplicated union of the BLOCK_M queries' top-k selections,
-    padded to top_k_cap.
+    Returns [B, H, n_q_blocks, cap] int32 indices, cap = min(top_k_cap,
+    n_kv_blocks). The deduplicated union of the BLOCK_M queries' top-k
+    picks is truncated to the highest-scoring blocks when it exceeds the
+    cap (block score = max over the query block's rows), and padded with
+    the out-of-range sentinel n_kv_blocks when it is short. The sentinel
+    is skipped by selected_attention; padding with a real block would
+    double-count it in the gather softmax.
     """
     B, H, Tq, D = Q.shape
     Tk = K.shape[2]
@@ -52,6 +56,10 @@ def _per_query_top_k_indices(
     k_per_query = min(top_k_per_query, n_kv_blocks)
     _, per_q_idx = torch.topk(scores, k_per_query, dim=-1)  # [B,H,T,k]
 
+    # Per-q-block block score for ranking when the union overflows the cap:
+    # the best (max) score any row in the query block gave the block.
+    block_level = scores.view(B, H, n_q_blocks, block_size_m, n_kv_blocks).amax(dim=3)
+
     # Aggregate to per-block: union over BLOCK_M queries' picks
     per_q_idx = per_q_idx.view(B, H, n_q_blocks, block_size_m * k_per_query)
     block_idx_list = []
@@ -59,12 +67,20 @@ def _per_query_top_k_indices(
     for b in range(B):
         for h in range(H):
             for qb in range(n_q_blocks):
-                unique = torch.unique(per_q_idx[b, h, qb])
-                if unique.numel() < cap:
-                    pad = unique.new_zeros(cap - unique.numel())
+                unique = torch.unique(per_q_idx[b, h, qb])   # sorted, deduplicated
+                if unique.numel() > cap:
+                    # Too many distinct blocks for one tile: keep the cap
+                    # highest-scoring blocks, not the lowest-index ones.
+                    sc = block_level[b, h, qb][unique]
+                    keep = torch.argsort(sc, descending=True)[:cap]
+                    unique = unique[keep]
+                elif unique.numel() < cap:
+                    # Pad with an out-of-range sentinel block. The selected
+                    # kernel gathers each slot independently, so padding with a
+                    # real block (the old code used 0) double-counts it in the
+                    # softmax; n_kv_blocks is out of range and gets skipped.
+                    pad = unique.new_full((cap - unique.numel(),), n_kv_blocks)
                     unique = torch.cat([unique, pad], dim=0)
-                else:
-                    unique = unique[:cap]
                 block_idx_list.append(unique)
     out_idx = torch.stack(block_idx_list, dim=0).view(B, H, n_q_blocks, cap)
     return out_idx.to(torch.int32).contiguous()
