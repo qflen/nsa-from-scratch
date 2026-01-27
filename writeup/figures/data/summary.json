@@ -1,0 +1,57 @@
+{
+  "nsa-100m-1b-32k": {
+    "run_id": "9w6g4b1t",
+    "state": "finished",
+    "n_steps": 3810,
+    "tokens_seen": 998768640,
+    "final_loss": 4.22011376619339,
+    "final_lr": 3.000127516547799e-05,
+    "peak_memory_gb": 33.71794366836548,
+    "n_params_estimate": 109510656,
+    "history_csv": "writeup/figures/data/nsa-100m-1b-32k.csv"
+  },
+  "nsa-150m-1b-32k": {
+    "run_id": "cf91402a",
+    "state": "finished",
+    "n_steps": 3810,
+    "tokens_seen": 998768640,
+    "final_loss": 4.070014569163322,
+    "final_lr": 3.000127516547799e-05,
+    "peak_memory_gb": 41.16736173629761,
+    "n_params_estimate": 163946496,
+    "history_csv": "writeup/figures/data/nsa-150m-1b-32k.csv"
+  },
+  "nsa-300m-500m-32k": {
+    "run_id": "gc58rvqr",
+    "state": "finished",
+    "n_steps": 1900,
+    "tokens_seen": 498073600,
+    "final_loss": 4.8654905498027805,
+    "final_lr": 3.0014632165495892e-05,
+    "peak_memory_gb": 58.728750705718994,
+    "n_params_estimate": 285736960,
+    "history_csv": "writeup/figures/data/nsa-300m-500m-32k.csv"
+  },
+  "dense-100m-1b-8k": {
+    "run_id": "cyiuliqg",
+    "state": "finished",
+    "n_steps": 3810,
+    "tokens_seen": 998768640,
+    "final_loss": 4.362794820964337,
+    "final_lr": 3.000127516547799e-05,
+    "peak_memory_gb": 9.278690814971924,
+    "n_params_estimate": 109510656,
+    "history_csv": "writeup/figures/data/dense-100m-1b-8k.csv"
+  },
+  "nsa-100m-500m-64k": {
+    "run_id": "bq119qh9",
+    "state": "finished",
+    "n_steps": 1900,
+    "tokens_seen": 498073600,
+    "final_loss": 5.146492421627045,
+    "final_lr": 3.0014632165495892e-05,
+    "peak_memory_gb": 65.46269464492798,
+    "n_params_estimate": 109510656,
+    "history_csv": "writeup/figures/data/nsa-100m-500m-64k.csv"
+  }
+}

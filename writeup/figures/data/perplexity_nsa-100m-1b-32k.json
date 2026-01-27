@@ -1,0 +1,45 @@
+{
+  "run_dir": "/workspace/runs/nsa-100m-1b-32k",
+  "tokenizer": "huggyllama/llama-7b",
+  "n_params_estimate": 109510656,
+  "attention": "nsa",
+  "model_max_pos": 32768,
+  "skip_examples": 10000000,
+  "results": [
+    {
+      "seq_len": 2048,
+      "mean_ce": 4.260299138724804,
+      "perplexity": 70.83116863092586,
+      "n_sequences": 32,
+      "n_tokens": 65536
+    },
+    {
+      "seq_len": 4096,
+      "mean_ce": 4.197376295924187,
+      "perplexity": 66.51159517021767,
+      "n_sequences": 32,
+      "n_tokens": 131072
+    },
+    {
+      "seq_len": 8192,
+      "mean_ce": 4.2382952272892,
+      "perplexity": 69.2896280280207,
+      "n_sequences": 32,
+      "n_tokens": 262144
+    },
+    {
+      "seq_len": 16384,
+      "mean_ce": 4.2594194412231445,
+      "perplexity": 70.76888602778335,
+      "n_sequences": 32,
+      "n_tokens": 524288
+    },
+    {
+      "seq_len": 32768,
+      "mean_ce": 4.255431070923805,
+      "perplexity": 70.48719562086539,
+      "n_sequences": 32,
+      "n_tokens": 1048576
+    }
+  ]
+}
