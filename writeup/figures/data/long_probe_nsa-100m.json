@@ -1,0 +1,54 @@
+{
+  "run_dir": "/workspace/runs/nsa-100m-1b-32k",
+  "model_trained_at": 32768,
+  "results": [
+    {
+      "seq_len": 65536,
+      "mode": "straight",
+      "rope_theta": 10000.0,
+      "mean_ce": 4.090973854064941,
+      "perplexity": 59.79809797812851,
+      "n_sequences": 2,
+      "n_tokens": 131072
+    },
+    {
+      "seq_len": 65536,
+      "mode": "ntk",
+      "rope_theta": 20452.228712025368,
+      "mean_ce": 4.096850395202637,
+      "perplexity": 60.15053851224481,
+      "n_sequences": 2,
+      "n_tokens": 131072
+    },
+    {
+      "seq_len": 262144,
+      "mode": "straight",
+      "rope_theta": 10000.0,
+      "mean_ce": 4.221411943435669,
+      "perplexity": 68.12961156813807,
+      "n_sequences": 2,
+      "n_tokens": 524288
+    },
+    {
+      "seq_len": 262144,
+      "mode": "ntk",
+      "rope_theta": 85550.37588568537,
+      "mean_ce": 4.292930841445923,
+      "perplexity": 73.18063534089677,
+      "n_sequences": 2,
+      "n_tokens": 524288
+    },
+    {
+      "seq_len": 1048576,
+      "mode": "straight",
+      "skipped": true,
+      "reason": "OOM: CUDA out of memory. Tried to allocate 125.00 GiB. GPU 0 has a total capacity of 93.10 GiB of which 28.69 GiB is free. Process 153117 has 64.40 GiB memory in use. Of the allocated memory 63.62 GiB is a"
+    },
+    {
+      "seq_len": 1048576,
+      "mode": "ntk",
+      "skipped": true,
+      "reason": "OOM: CUDA out of memory. Tried to allocate 125.00 GiB. GPU 0 has a total capacity of 93.10 GiB of which 28.57 GiB is free. Process 153117 has 64.52 GiB memory in use. Of the allocated memory 63.62 GiB is a"
+    }
+  ]
+}

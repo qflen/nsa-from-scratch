@@ -1,0 +1,69 @@
+{
+  "run_dir": "/workspace/runs/nsa-100m-1b-32k",
+  "scoring": "answer-token NLL given long-context prompt (likelihood, not generation)",
+  "max_examples_per_task": 24,
+  "model_max_pos": 32768,
+  "n_params_estimate": 109510656,
+  "results": [
+    {
+      "task": "narrativeqa",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 6.1740246911843615,
+      "mean_perplexity": 5043.843632722804,
+      "median_nll": 5.927474021911621,
+      "mean_prompt_len": 23226.25,
+      "mean_answer_len": 7.75
+    },
+    {
+      "task": "qasper",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 7.124686062335968,
+      "mean_perplexity": 46564.05707998253,
+      "median_nll": 6.436690807342529,
+      "mean_prompt_len": 6501.291666666667,
+      "mean_answer_len": 19.708333333333332
+    },
+    {
+      "task": "multifieldqa_en",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 4.946358968814214,
+      "mean_perplexity": 564.9780200289664,
+      "median_nll": 4.788187503814697,
+      "mean_prompt_len": 8769.083333333334,
+      "mean_answer_len": 14.625
+    },
+    {
+      "task": "gov_report",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 4.086699853340785,
+      "mean_perplexity": 62.6657469275326,
+      "median_nll": 4.137732982635498,
+      "mean_prompt_len": 12650.25,
+      "mean_answer_len": 873.125
+    },
+    {
+      "task": "qmsum",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 5.000905116399129,
+      "mean_perplexity": 163.3544235625627,
+      "median_nll": 5.0256195068359375,
+      "mean_prompt_len": 15713.625,
+      "mean_answer_len": 84.66666666666667
+    },
+    {
+      "task": "lcc",
+      "n_examples": 24,
+      "n_skipped": 0,
+      "mean_nll": 12.592533310254415,
+      "mean_perplexity": 830824212.9477448,
+      "median_nll": 11.239204406738281,
+      "mean_prompt_len": 4488.25,
+      "mean_answer_len": 14.875
+    }
+  ]
+}

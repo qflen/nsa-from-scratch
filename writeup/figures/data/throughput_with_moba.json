@@ -1,0 +1,191 @@
+[
+  {
+    "impl": "nsa",
+    "seq_len": 1024,
+    "tokens_per_sec": 2035754.6471173745,
+    "ms_per_call": 0.5030075709025066,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 1024,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 1024,
+    "tokens_per_sec": 39891337.11455108,
+    "ms_per_call": 0.02566973368326823,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 1024,
+    "tokens_per_sec": 83769.0433027814,
+    "ms_per_call": 12.224086125691732,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 2048,
+    "tokens_per_sec": 4157895.346090548,
+    "ms_per_call": 0.49255688985188806,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 2048,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 2048,
+    "tokens_per_sec": 29283867.92727273,
+    "ms_per_call": 0.06993611653645833,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 2048,
+    "tokens_per_sec": 69699.63953354709,
+    "ms_per_call": 29.383222262064617,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 4096,
+    "tokens_per_sec": 8269359.104065719,
+    "ms_per_call": 0.4953225453694661,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 4096,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 4096,
+    "tokens_per_sec": 18955354.00956234,
+    "ms_per_call": 0.21608670552571616,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 4096,
+    "tokens_per_sec": 74133.25006871833,
+    "ms_per_call": 55.25186061859131,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 8192,
+    "tokens_per_sec": 13457695.032835042,
+    "ms_per_call": 0.6087223688761393,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 8192,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 8192,
+    "tokens_per_sec": 11825757.483393565,
+    "ms_per_call": 0.6927251815795898,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 8192,
+    "tokens_per_sec": 79687.62884516224,
+    "ms_per_call": 102.80140240987141,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 16384,
+    "tokens_per_sec": 14350041.082525894,
+    "ms_per_call": 1.1417388916015625,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 16384,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 16384,
+    "tokens_per_sec": 5971971.559572434,
+    "ms_per_call": 2.7434825897216797,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 16384,
+    "tokens_per_sec": 79838.52411927166,
+    "ms_per_call": 205.21421432495117,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 32768,
+    "tokens_per_sec": 13348901.356073778,
+    "ms_per_call": 2.4547338485717773,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 32768,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 32768,
+    "tokens_per_sec": 3012833.8728348194,
+    "ms_per_call": 10.876139005025228,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 32768,
+    "tokens_per_sec": 79915.4005964395,
+    "ms_per_call": 410.03360748291016,
+    "iters": 30
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 65536,
+    "tokens_per_sec": 11359592.592625245,
+    "ms_per_call": 5.769220987955729,
+    "iters": 30
+  },
+  {
+    "impl": "fa3",
+    "seq_len": 65536,
+    "tokens_per_sec": null,
+    "error": "ModuleNotFoundError: No module named 'flash_attn'"
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 65536,
+    "tokens_per_sec": 1499513.4342108564,
+    "ms_per_call": 43.704843521118164,
+    "iters": 30
+  },
+  {
+    "impl": "moba",
+    "seq_len": 65536,
+    "tokens_per_sec": 79092.49275205356,
+    "ms_per_call": 828.5995006561279,
+    "iters": 30
+  }
+]
