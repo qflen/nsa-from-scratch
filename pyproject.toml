@@ -1,16 +1,39 @@
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "nsa-from-scratch"
-version = "0.0.1"
-description = "Reimplementation of Native Sparse Attention (arXiv 2502.11089)"
+version = "0.1.0"
+description = "From-scratch reimplementation of DeepSeek's Native Sparse Attention (Yuan et al. 2025) in Triton and CUDA"
 readme = "README.md"
-requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
-authors = [{name = "qflen"}]
-dependencies = []
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Kimon", email = "nkimon00@gmail.com" }]
+
+dependencies = [
+    "torch>=2.4.0",
+    "triton>=3.0.0",
+    "transformers>=4.44.0",
+    "datasets>=2.20.0",
+    "einops>=0.8.0",
+    "matplotlib>=3.9.0",
+    "numpy>=1.26.0",
+    "pyyaml>=6.0",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+train = ["wandb>=0.17.0"]
+dev = ["pytest>=8.0.0", "pytest-xdist>=3.6.0", "ruff>=0.5.0"]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["nsa*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
