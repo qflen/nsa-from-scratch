@@ -10,7 +10,7 @@ All three NSA branches (compressed, selected, sliding window) implemented as Tri
 - **NSA-100M perplexity stays essentially flat from 2k to 32k evaluation context** (range 66.5 to 70.8 on a held-out FineWeb-Edu split). The long-context-stability claim of NSA lands at training-budget scale.
 - **NSA trains stably at 64k context** at 100M parameters, where dense full attention OOMs the H100 80 GB even at this small a model.
 
-Plots: `writeup/figures/01_throughput.png`, `02_memory.png`, `03_loss_curves.png`, `04_perplexity_vs_ctx.png`, `05_scaling_trend.png`. Full writeup at `writeup/post.md`.
+Plots: `writeup/figures/01_throughput.png`, `02_memory.png`, `03_loss_curves.png`, `04_perplexity_vs_ctx.png`, `05_scaling_trend.png`, `06_longbench.png`. Full writeup at `writeup/post.md`.
 
 ## Reproducing the benchmarks
 
