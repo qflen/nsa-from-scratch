@@ -62,7 +62,7 @@ nsa/
   triton/               compressed.py, selected.py, sliding.py, gating.py, forward.py, backward.py, fp8.py
   cuda/                 selected_fwd.cu (Hopper WGMMA), selected_bwd.cu (in-progress), bindings.cpp
   model/                llama_nsa.py, llama_dense.py, config.py
-  train/                train.py, data.py, config_*.yaml (NSA-100M, 150M, 300M, dense, 64k, sanity, top-k ablation)
+  train/                train.py, data.py, config_*.yaml (NSA-100M, 150M, 300M, dense, 64k, sanity)
   eval/                 perplexity.py
   bench/                throughput.py, memory.py, correctness.py, autotune.py, plots.py
 tests/                  test_{compressed,selected,sliding,combined,fp8,training_step,cuda_selected,cuda_selected_bwd}_forward|backward.py
