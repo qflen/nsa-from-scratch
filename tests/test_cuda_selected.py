@@ -5,7 +5,6 @@ tighter 1e-3 rel error; sweep uses 1e-2 (bf16 streaming softmax).
 
 from __future__ import annotations
 
-import math
 
 import pytest
 import torch

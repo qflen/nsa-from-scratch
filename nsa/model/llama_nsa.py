@@ -10,13 +10,11 @@ from typing import Optional
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch import Tensor
 
 from nsa.model.config import TransformerConfig
 from nsa.model.llama_dense import (
     RMSNorm,
-    SwiGLU,
     TransformerBlock,
     _apply_rope,
     _build_rope_cache,

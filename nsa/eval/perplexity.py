@@ -15,7 +15,6 @@ from typing import Iterator
 
 import torch
 import torch.nn.functional as F
-import yaml
 
 from nsa.model.config import TransformerConfig
 from nsa.model.llama_dense import LlamaDense

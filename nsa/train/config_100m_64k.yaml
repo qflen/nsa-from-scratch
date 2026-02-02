@@ -27,7 +27,6 @@ arch:
   nsa_window_size: 512
   nsa_pool: mean
   nsa_gate_activation: sigmoid
-  nsa_use_compressed_as_scorer: true
 
 seq_len: 65536
 micro_batch: 1

@@ -12,11 +12,10 @@ dependencies = [
     "triton>=3.0.0",
     "transformers>=4.44.0",
     "datasets>=2.20.0",
-    "einops>=0.8.0",
     "matplotlib>=3.9.0",
     "numpy>=1.26.0",
+    "pandas>=2.0.0",
     "pyyaml>=6.0",
-    "tqdm>=4.66.0",
 ]
 
 [project.optional-dependencies]
@@ -37,3 +36,14 @@ addopts = "-q"
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+
+[tool.ruff.lint]
+ignore = [
+    "E402",  # lazy imports inside conditionals (e.g. flash_attn) keep install cheap on CPU-only hosts
+    "E701",  # one-line if/return is idiomatic in Triton kernel code
+    "E731",  # bench uses `fn = lambda: ...` for terse closures
+    "E741",  # O, I, l are mathematical conventions in attention code
+]
+
+[tool.ruff.lint.per-file-ignores]
+"nsa/bench/memory.py" = ["F821"]  # closure-captured Q/K/V trips ruff because of a later `del`

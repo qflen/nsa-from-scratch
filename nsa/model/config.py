@@ -6,7 +6,7 @@ knobs. The dense baseline shares everything except `attention="dense"`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 
@@ -34,7 +34,6 @@ class TransformerConfig:
     nsa_window_size: int = 512
     nsa_pool: Literal["mean", "learned"] = "mean"
     nsa_gate_activation: Literal["sigmoid", "softmax"] = "sigmoid"
-    nsa_use_compressed_as_scorer: bool = True
 
     @property
     def n_params_estimate(self) -> int:

@@ -78,7 +78,6 @@ def _compressed_attn_fwd_kernel(
     offs_m = pid_m * BLOCK_M + tl.arange(0, BLOCK_M)  # [BLOCK_M]
     offs_d = tl.arange(0, BLOCK_D)                    # [BLOCK_D]
     mask_m = offs_m < Tq
-    mask_d = offs_d < BLOCK_D  # BLOCK_D is exact head dim, kept for shape
 
     # Load Q tile.
     q_ptrs = (

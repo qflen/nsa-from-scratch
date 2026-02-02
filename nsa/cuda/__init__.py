@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 import os
-from typing import Optional, Tuple
+from typing import Tuple
 
 import torch
 

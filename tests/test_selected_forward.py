@@ -90,7 +90,6 @@ def _reference_with_fixed_indices(
         V = F.pad(V, (0, 0, 0, pad_k))
     if pad_q:
         Q = F.pad(Q, (0, 0, 0, pad_q))
-    Tk_p = K.shape[2]
     Tq_p = Q.shape[2]
     n_q = Tq_p // block_size_m
 

@@ -7,9 +7,7 @@ on: if these break, the kernel correctness checks have no ground truth.
 
 from __future__ import annotations
 
-import math
 
-import pytest
 import torch
 
 from nsa.reference import (

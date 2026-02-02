@@ -6,7 +6,6 @@ operator: this one calls torch.nn.functional.scaled_dot_product_attention
 
 from __future__ import annotations
 
-import math
 from typing import Optional
 
 import torch

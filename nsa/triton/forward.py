@@ -16,8 +16,6 @@ from torch import Tensor
 from nsa.reference import (
     NSAConfig,
     compressed_attention_reference,
-    selected_attention_reference,
-    sliding_attention_reference,
 )
 
 
@@ -80,7 +78,6 @@ def _sliding_attention_chunked(
     return out.to(Q.dtype)
 from nsa.triton.compressed import compressed_attention as _compressed_kernel
 from nsa.triton.gating import combine
-from nsa.triton.selected import selected_attention as _selected_kernel
 from nsa.triton.sliding import sliding_attention as _sliding_kernel
 
 

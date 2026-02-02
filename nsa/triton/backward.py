@@ -6,11 +6,8 @@ fp32 lets us compute dS = P*(dP - D) per tile.
 
 from __future__ import annotations
 
-import math
-from typing import Optional
 
 import torch
-import torch.nn.functional as F
 import triton
 import triton.language as tl
 

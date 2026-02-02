@@ -20,7 +20,7 @@ if _cap[0] < 9:
 
 from nsa.triton.selected import selected_attention as triton_selected
 from nsa.triton.backward import selected_backward as triton_selected_bwd
-from nsa.cuda import selected_attention_cuda, selected_backward_cuda
+from nsa.cuda import selected_backward_cuda
 
 
 def _make_qkv_do(B, H, Tq, Tk, D, dtype=torch.bfloat16, seed=0):
@@ -93,7 +93,6 @@ def _run_fwd_for_O_LSE(Qp, Kp, Vp, indices, BM, BN, top_k, causal):
     (out, lse) shapes; the backward needs padded versions.
     """
     B, H, Tq_p, D = Qp.shape
-    Tk_p = Kp.shape[2]
     out, lse = triton_selected(
         Qp, Kp, Vp, block_size_n=BN, block_size_m=BM, top_k=top_k,
         block_indices=indices, causal=causal,
