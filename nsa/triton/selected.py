@@ -18,8 +18,8 @@ import triton.language as tl
 
 
 # Large negative used in place of -inf inside the kernel; -inf can poison
-# fp32 max-reductions in some Triton versions, so we use a big-but-finite
-# constant. Anything that ends up as -1e30 will be excluded from the
+# fp32 max-reductions in some Triton versions, so a big-but-finite
+# constant is used instead. Anything that ends up as -1e30 will be excluded from the
 # softmax via the streaming update math, and rows that remain all
 # -1e30 will be detected and zeroed at the end.
 # (Inlined as a literal in the kernel because Triton 3.0 does not allow
@@ -46,10 +46,10 @@ def _selected_attn_fwd(
     pid_qb = tl.program_id(0)   # which query block
     pid_bh = tl.program_id(1)   # batch * head packed
 
-    # We fold (b, h) into one program-id dimension so the launch grid stays 2D.
+    # (b, h) is folded into one program-id dimension so the launch grid stays 2D.
     # The strides handle the actual addressing.
     # Caller passes pid_bh = b * H + h via the launch grid shape.
-    # We do not need B or H here separately.
+    # B and H are not needed separately here.
 
     # Compute starting offsets for Q, Out, Lse for this (bh, qb) tile.
     q_block_start = pid_qb * BLOCK_M
@@ -274,9 +274,9 @@ def selected_attention(
     out_p = torch.empty((B, H, Tq_p, D), dtype=Q.dtype, device=Q.device)
     lse_p = torch.empty((B, H, Tq_p), dtype=torch.float32, device=Q.device)
 
-    # Fold (B, H) into the second program-id axis. The strides we pass let
+    # Fold (B, H) into the second program-id axis. The strides passed let
     # the kernel address the right slice from a single bh index.
-    # We also reshape Q/K/V/out/lse views to be indexed by a flat [BH, T, D]
+    # Q/K/V/out/lse views are also reshaped to be indexed by a flat [BH, T, D]
     # layout, which simplifies the in-kernel arithmetic.
     Qv = Q.view(B * H, Tq_p, D)
     Kv = K.view(B * H, Tk_p, D)
@@ -290,7 +290,7 @@ def selected_attention(
     _selected_attn_fwd[grid](
         Qv, Kv, Vv, Iv, Ov, Lv,
         # Q strides: (bh, m, d). The "stride_qb" slot is unused for the flat
-        # layout but kept in the signature for clarity; we pass 0.
+        # layout but kept in the signature for clarity; pass 0.
         0, Qv.stride(0), Qv.stride(1), Qv.stride(2),
         0, Kv.stride(0), Kv.stride(1), Kv.stride(2),
         0, Vv.stride(0), Vv.stride(1), Vv.stride(2),

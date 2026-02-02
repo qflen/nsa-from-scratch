@@ -98,14 +98,14 @@ def _compressed_attn_fwd_kernel(
     # Causal upper bound on n (compressed block index) per query row.
     # max_block(q) = floor((q + (Tk_padded - Tq) + 1) / BLOCK_C) - 1.
     # The number of legal blocks for the whole tile is governed by the
-    # last query in the tile (largest q, hence largest max_block). We tile
+    # last query in the tile (largest q, hence largest max_block). Tile
     # across n up to that bound and apply the per-row mask inside.
     if CAUSAL:
         offset = Tk_padded - Tq
         # Largest q in the tile that is in-range:
         last_q = tl.minimum(pid_m * BLOCK_M + BLOCK_M - 1, Tq - 1)
         max_block_tile = (last_q + offset + 1) // BLOCK_C - 1  # scalar
-        # Number of n-blocks we need to scan, clamped to >= 0.
+        # Number of n-blocks to scan, clamped to >= 0.
         n_end = tl.maximum(max_block_tile + 1, 0)
         n_end = tl.minimum(n_end, Nc)
     else:
@@ -158,8 +158,8 @@ def _compressed_attn_fwd_kernel(
             tl.exp(qk - m_new[:, None]),
         )
         # Drop illegal entries (also -inf turned into 0 by the where above for
-        # the all-illegal rows; but for partial rows we still need to zero out
-        # masked columns since exp(-inf - m_new) = 0 already on real -inf).
+        # the all-illegal rows; partial rows still need their masked columns
+        # zeroed out, since exp(-inf - m_new) = 0 already on real -inf).
         l_ij = tl.sum(p, axis=1)
         l_i = l_i * alpha + l_ij
         acc = acc * alpha[:, None] + tl.dot(p.to(v.dtype), v, out_dtype=tl.float32)
@@ -239,7 +239,7 @@ def compressed_attention(
     Tk_padded = Nc * block_size_c
 
     # Make sure Q and pooled tensors are contiguous on the head/batch axes so
-    # we can fuse (b, h) into the program-id-1 dimension.
+    # (b, h) can be fused into the program-id-1 dimension.
     Q_c = Q.contiguous()
     Kc_c = Kc.contiguous()
     Vc_c = Vc.contiguous()
@@ -264,7 +264,7 @@ def compressed_attention(
         # Returns (stride_h_fused, stride_t, stride_d). stride_h_fused = stride for
         # advancing one head, treating (b, h) as a flat axis.
         sb, sh, st, sd = t.stride()
-        # We need bh-linear stride == sh when batch and head are jointly contiguous in
+        # bh-linear stride == sh is required when batch and head are jointly contiguous in
         # standard [B, H, T, D] layout: bh = b * H + h, advancing bh by 1 must advance
         # the pointer by sh when h < H - 1, and by sb - (H - 1) * sh when wrapping.
         # That is only equal to sh if sb == H * sh, which is true for contiguous tensors.

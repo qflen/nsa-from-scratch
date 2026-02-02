@@ -85,8 +85,8 @@ def plot_memory(rows: list[dict], out_path: Path):
                     color=color, linewidth=2, markersize=6)
         for x in oom_x:
             # Plot the OOM marker as a single X above the y limit will be
-            # set later. Use the H100 NVL boundary (80 GB) as a visible y.
-            ax.plot([x], [80], marker="x", color=color, markersize=14, markeredgewidth=2.5,
+            # set later. Use the H100 NVL boundary (94 GB) as a visible y.
+            ax.plot([x], [94], marker="x", color=color, markersize=14, markeredgewidth=2.5,
                     label=f"{_IMPL_LABEL.get(impl, impl)} OOM" if x == oom_x[0] else None)
 
     ax.set_xscale("log", base=2)
@@ -94,8 +94,8 @@ def plot_memory(rows: list[dict], out_path: Path):
     ax.set_xlabel("sequence length (tokens)")
     ax.set_ylabel("peak GPU memory (GB), log scale")
     ax.set_title("NSA forward memory vs full attention (H100, B=1, H=16, D=64)")
-    ax.axhline(80, color="k", linestyle="--", alpha=0.3, linewidth=1, zorder=1)
-    ax.text(2**13, 80, "H100 NVL 80 GB", color="k", alpha=0.6, fontsize=9,
+    ax.axhline(94, color="k", linestyle="--", alpha=0.3, linewidth=1, zorder=1)
+    ax.text(2**13, 94, "H100 NVL 94 GB", color="k", alpha=0.6, fontsize=9,
             ha="left", va="bottom")
     leg = ax.legend(loc="upper left", frameon=True, framealpha=1.0,
                     edgecolor="none", facecolor="white")

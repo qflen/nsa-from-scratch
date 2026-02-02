@@ -91,10 +91,11 @@ def _autograd_grads_through_reference(
 ) -> tuple[Tensor, Tensor, Tensor]:
     """Re-run a reference attention with autograd enabled and pull dQ, dK, dV.
 
-    The reference functions can produce nan on causally-empty rows; we set
-    nan output rows to zero before the autograd pass so upstream gradients
-    are finite. nan rows are exactly the rows whose attention output is
-    undefined (no legal keys), and contribute zero to any well-defined loss.
+    The reference functions can produce nan on causally-empty rows; nan
+    output rows are set to zero before the autograd pass so upstream
+    gradients are finite. nan rows are exactly the rows whose attention
+    output is undefined (no legal keys), and contribute zero to any
+    well-defined loss.
     """
     with torch.enable_grad():
         Qd = Q.detach().requires_grad_(True)
@@ -152,9 +153,9 @@ class _SelectedFn(torch.autograd.Function):
     def forward(ctx, Q, K, V, block_size_n, block_size_m, top_k, block_indices, causal, scale):
         # fp64 path: gradcheck uses fp64 to detect numerical inaccuracy in
         # an autograd.Function. The Triton kernels are bf16/fp16 only, so
-        # we reroute fp64 through the reference. We do NOT save the fp64
+        # fp64 is rerouted through the reference. Do NOT save the fp64
         # autograd graph (gradcheck calls backward several times for fast
-        # mode and would error on a freed graph); instead we save just the
+        # mode and would error on a freed graph); instead save just the
         # detached tensors and rebuild the graph on each backward call.
         if Q.dtype == torch.float64:
             from nsa.reference import selected_attention_reference
@@ -172,11 +173,11 @@ class _SelectedFn(torch.autograd.Function):
             ctx._fp64_args = (block_size_n, block_size_m, top_k, causal, scale)
             return out_ref
 
-        # Inline the padding + kernel launch so we can save padded tensors
+        # Inline the padding + kernel launch to save padded tensors
         # for the backward pass without re-running the whole forward.
         from nsa.triton.selected import selected_attention as _sel_unpadded
         # The Triton wrapper handles padding/unpad internally and returns
-        # unpadded (out, lse). For the backward we need the PADDED versions
+        # unpadded (out, lse). For the backward, the PADDED versions are needed
         # so the gradient kernel matches the forward gather pattern. Easiest
         # robust path: call the wrapper, then re-pad in backward when needed.
         out, lse = _sel_unpadded(
@@ -224,7 +225,7 @@ class _SelectedFn(torch.autograd.Function):
         from nsa.triton.backward import selected_backward as _sel_bwd
 
         # Re-pad to match the kernel's gather pattern. The forward unpadded
-        # the tensors before returning, so we re-apply the same pad here.
+        # the tensors before returning, so re-apply the same pad here.
         B, H, Tq, D = Q.shape
         Tk = K.shape[2]
         bs_m, bs_n = ctx.block_size_m, ctx.block_size_n
@@ -334,8 +335,8 @@ def _resolve_block_indices(
     Kp = F.pad(K, (0, 0, 0, pad_k)) if pad_k else K
     n_q = Qp.shape[2] // block_size_m
     n_k = Kp.shape[2] // block_size_n
-    # detach so the scorer never enters the autograd graph (cheap; we don't
-    # train through this path, the kernel path is what trains). Order
+    # detach so the scorer never enters the autograd graph (cheap; the scorer
+    # does not train through this path, the kernel path is what trains). Order
     # matters: reduce in input dtype, then cast to fp32. Casting before
     # the mean changes fp precision and can pick different topk indices
     # from the reference, which means the kernel and the reference would

@@ -98,8 +98,8 @@ def test_compressed_causal_no_future_leak():
     out, _ = compressed_attention_reference(Q, K, V, block_size_c=32, causal=True)
     # With block_size_c = 32 and Tq = Tk = 128, query 0 sees zero blocks
     # (legal max_block = -1), so the implementation should produce a zero
-    # output for that row (softmax of all -inf is undefined but we mask back
-    # to 0 via the weights * V einsum giving 0/0 -> nan; verify that this
-    # specific edge case is handled or that we accept the documented behavior).
-    # We assert output is finite for queries that have at least one legal block.
+    # output for that row (softmax of all -inf is undefined but the mask
+    # zeros it back via the weights * V einsum giving 0/0 -> nan; verify
+    # the edge case is handled or that the documented behavior is accepted).
+    # Assert output is finite for queries that have at least one legal block.
     assert torch.isfinite(out[:, :, 32:, :]).all()

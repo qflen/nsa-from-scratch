@@ -29,8 +29,8 @@ make_smem_desc(uint32_t smem_addr, uint32_t lbo_bytes, uint32_t sbo_bytes) {
 }
 
 // ---------------------------------------------------------------------------
-// WGMMA control + atoms via inline PTX. We use the SS form (both operands
-// from smem) for both QKt and PV; tnspA = tnspB = 0 (Major::K), scaleA =
+// WGMMA control + atoms via inline PTX. The SS form is used for both
+// operands from smem on both QKt and PV; tnspA = tnspB = 0 (Major::K), scaleA =
 // scaleB = +1, scaleD predicated by the C-source flag.
 // ---------------------------------------------------------------------------
 __device__ __forceinline__ void wgmma_fence() {
@@ -159,7 +159,7 @@ struct AddOp { __device__ __forceinline__ float operator()(float a, float b) con
 //
 // load_tile_gather_core_V_T: per-row gmem pointers into V, but transpose
 // at write time: gmem V[bn, d] -> smem element at core_idx(d, bn, BLOCK_N).
-// We do this with one BF16 store per element (slow but safe; total 64*64
+// Done with one BF16 store per element (slow but safe; total 64*64
 // BF16 = 4096 stores per CTA per top_k iter, at 32 stores/thread for 128
 // threads per warpgroup).
 // ---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ load_tile_gather_core_V_T(__nv_bfloat16* smem,
 
 // Store the P tile (BLOCK_M x BLOCK_N, fp32 in fragment regs) to smem
 // (bf16) in K-major canonical layout. Each thread writes 4 * (BLOCK_N/8)
-// BF16 values; we pack adjacent col pairs into one 32-bit store.
+// BF16 values; adjacent col pairs are packed into one 32-bit store.
 __device__ __forceinline__ void
 store_p_to_smem(__nv_bfloat16* smem,
                 const float* p_fp32,
@@ -363,7 +363,7 @@ void selected_attn_fwd_kernel(
     // K: (BLOCK_N, D), K-major (D contiguous). SBO_bytes = 128 * (D/8).
     const uint64_t descK = make_smem_desc(sK_addr, 128u, 128u * (D / 8));
     // V (transposed): (D rows, BLOCK_N cols), K-major (BLOCK_N contiguous).
-    // For WGMMA #2 (P @ V), B is (K=BLOCK_N, N=D). With our transposed
+    // For WGMMA #2 (P @ V), B is (K=BLOCK_N, N=D). With the transposed
     // smem, mode 0 (N=D) is the outer row, mode 1 (K=BLOCK_N) is contiguous
     // -> K-major. SBO_bytes = 128 * (BLOCK_N / 8) for N step.
     const uint64_t descV = make_smem_desc(sV_addr, 128u, 128u * (BLOCK_N / 8));

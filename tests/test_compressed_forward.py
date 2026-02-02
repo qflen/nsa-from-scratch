@@ -41,7 +41,7 @@ def _legal_row_mask(Tq: int, Tk: int, block_size_c: int, causal: bool, device) -
     """Boolean [Tq] mask: True where the row has at least one legal block.
 
     With Tk possibly padded up to a multiple of block_size_c. The reference
-    computes legality with the (already padded) Tk; we mirror that here.
+    computes legality with the (already padded) Tk; the same is mirrored here.
     """
     Nc = (Tk + block_size_c - 1) // block_size_c
     Tk_padded = Nc * block_size_c
@@ -65,7 +65,7 @@ def _check(
 
     On rows where the reference output is near zero (true result happens to
     be tiny by chance of softmax peakedness), pure relative error blows up
-    due to fp16/bf16 quantization noise. We use the standard allclose form:
+    due to fp16/bf16 quantization noise. The standard allclose form is used:
 
         |kernel - ref| <= out_rel_tol * |ref| + out_abs_tol
 

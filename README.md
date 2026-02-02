@@ -1,16 +1,43 @@
 # nsa-from-scratch
 
-A from-scratch reimplementation of DeepSeek's Native Sparse Attention (Yuan et al., February 2025, [arXiv:2502.11089](https://arxiv.org/abs/2502.11089)).
+[![CI](https://img.shields.io/github/actions/workflow/status/qflen/nsa-from-scratch/ci.yml?branch=main&label=CI)](https://github.com/qflen/nsa-from-scratch/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch 2.4+](https://img.shields.io/badge/PyTorch-2.4+-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Triton 3.0+](https://img.shields.io/badge/Triton-3.0+-9D4EDD.svg)](https://github.com/openai/triton)
+[![CUDA sm_90a](https://img.shields.io/badge/CUDA-sm__90a%20(Hopper)-76B900.svg?logo=nvidia&logoColor=white)](https://developer.nvidia.com/cuda-toolkit)
+[![arXiv 2502.11089](https://img.shields.io/badge/arXiv-2502.11089-b31b1b.svg)](https://arxiv.org/abs/2502.11089)
 
-All three NSA branches (compressed, selected, sliding window) implemented as Triton kernels. The selected branch is additionally implemented in CUDA C++ on Hopper using WGMMA. Multi-precision: FP16, BF16, FP8. Validated by training a five-model fleet (NSA-100M, NSA-150M, NSA-300M, dense-100M baseline, NSA-100M at 64k context) and a perplexity sweep on the long-context-trained NSA-100M.
+From-scratch reimplementation of DeepSeek's Native Sparse Attention (Yuan et al., February 2025, [arXiv:2502.11089](https://arxiv.org/abs/2502.11089)): a sparse-attention design that holds language-model quality at long context while beating FlashAttention-3 in wall-clock time as the sequence grows.
 
-## Headline
+**Full writeup:** [writeup/post.md](writeup/post.md)
 
-- **NSA forward is 7.4x FlashAttention-3 at 64k context** on H100 NVL, batch 1, head dim 64, bf16. NSA flattens at roughly 12M tok/s from 8k onward; FA-3 drops off quadratically.
-- **NSA-100M perplexity stays essentially flat from 2k to 32k evaluation context** (range 66.5 to 70.8 on a held-out FineWeb-Edu split). The long-context-stability claim of NSA lands at training-budget scale.
-- **NSA trains stably at 64k context** at 100M parameters, where dense full attention OOMs the H100 80 GB even at this small a model.
+## Headline results
 
-Plots: `writeup/figures/01_throughput.png`, `02_memory.png`, `03_loss_curves.png`, `04_perplexity_vs_ctx.png`, `05_scaling_trend.png`, `06_longbench.png`. Full writeup at `writeup/post.md`.
+| Result | Number | Hardware |
+|---|---|---|
+| NSA forward at 64k context vs FlashAttention-3 | **7.4x faster** (11.1M vs 1.5M tok/s) | H100 NVL, 94 GB |
+| NSA-100M perplexity, 2k to 32k evaluation context | flat (66.5 to 70.8 on a FineWeb-Edu held-out split) | (eval) |
+| NSA-100M trains stably at 64k context | 500M tokens, no loss spikes or divergence | A100 SXM, 80 GB |
+| Dense full attention at 64k context, same 100M params | OOMs the card at this batch shape | A100 PCIe, 80 GB |
+
+Throughput at 1k to 64k, perplexity at 2k to 256k, training-loss curves for a five-model fleet (NSA-100M, NSA-150M, NSA-300M, dense-100M baseline, NSA-100M at 64k context), LongBench v2 likelihood across six tasks, and a MoBA cross-comparison are all in the [writeup](writeup/post.md).
+
+## What is implemented
+
+- All three NSA branches (compressed, selected, sliding window) as Triton kernels.
+- The selected branch additionally implemented in CUDA C++ on Hopper using inline-PTX WGMMA atoms (`m64n64k16` and `m64n128k16` at D=64 and D=128).
+- Multi-precision: FP16, BF16, FP8 (per-tensor absmax, bf16 dequant in the wrapper).
+- Hand-written Triton selected backward (FA-2 style streaming softmax adapted to the gather pattern, atomic-add into fp32 dK/dV buffers).
+- 48-config autotune sweep (BLOCK_M, BLOCK_N, num_warps, num_stages) for the selected branch on Hopper.
+- A five-model training fleet on FineWeb-Edu at 32k to 64k context with bf16 mixed precision.
+- Long-context perplexity sweep across six evaluation lengths (2k to 256k) with straight and NTK-aware RoPE extension.
+- LongBench v2 gold-answer-likelihood subset across six tasks.
+- MoBA (Liu et al., February 2025) cross-comparison on the same Triton bench harness.
+
+## Stack
+
+Python, PyTorch, Triton, CUDA C++ (Hopper sm_90a, WGMMA inline-PTX), torch.utils.cpp_extension, pybind11, wandb, matplotlib. RunPod for GPU rental (H100 NVL, A100 SXM, A100 PCIe).
 
 ## Reproducing the benchmarks
 
@@ -33,7 +60,7 @@ python -m nsa.train.train --config nsa/train/config_100m.yaml         # NSA-100M
 python -m nsa.train.train --config nsa/train/config_150m.yaml         # NSA-150M, 1B tokens
 python -m nsa.train.train --config nsa/train/config_300m.yaml         # NSA-300M, 500M tokens
 
-# Dense baseline at the largest workable context (8k on H100 PCIe at this batch shape)
+# Dense baseline at the largest workable context (8k on A100 PCIe at this batch shape)
 python -m nsa.train.train --config nsa/train/config_dense_100m.yaml
 
 # Long-context training demonstration (64k context, 100M parameters)
@@ -63,7 +90,7 @@ nsa/
   cuda/                 selected_fwd.cu (Hopper WGMMA), selected_bwd.cu (in-progress), bindings.cpp
   model/                llama_nsa.py, llama_dense.py, config.py
   train/                train.py, data.py, config_*.yaml (NSA-100M, 150M, 300M, dense, 64k, sanity)
-  eval/                 perplexity.py
+  eval/                 perplexity.py, long_context_probe.py, longbench.py
   bench/                throughput.py, memory.py, correctness.py, autotune.py, plots.py
 tests/                  test_{compressed,selected,sliding,combined,fp8,training_step,cuda_selected,cuda_selected_bwd}_forward|backward.py
 writeup/                post.md, figures/{01..06}.png

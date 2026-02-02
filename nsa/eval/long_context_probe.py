@@ -1,5 +1,5 @@
 """Long-context inference probe (256k / 1M) for NSA-100M. The trained
-context is 32k, so we report two RoPE-extension variants: "straight"
+context is 32k, so two RoPE-extension variants are reported: "straight"
 (reuse base=10000, honestly degraded) and "ntk-aware" (base scaled by
 (T / T_train) ** (D / (D - 2)), no fine-tune).
 """

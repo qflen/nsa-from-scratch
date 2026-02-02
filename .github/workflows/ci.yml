@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - run: pip install 'ruff>=0.5.0'
+      - run: ruff check .
+
+  syntax:
+    name: Syntax (py_compile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: py_compile sweep
+        run: |
+          python - <<'PY'
+          import py_compile, pathlib, sys
+          bad = []
+          for p in pathlib.Path('.').rglob('*.py'):
+              if any(part in p.parts for part in ('.git', '__pycache__', 'runs', '.venv', 'build')):
+                  continue
+              try:
+                  py_compile.compile(str(p), doraise=True)
+              except py_compile.PyCompileError as e:
+                  bad.append((str(p), str(e)))
+          if bad:
+              for p, e in bad:
+                  print(f'FAIL: {p}: {e}', file=sys.stderr)
+              sys.exit(1)
+          print('py_compile: ok')
+          PY
+
+  reference-tests:
+    name: Reference tests (CPU)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      - name: Install CPU torch + pytest
+        run: |
+          pip install --index-url https://download.pytorch.org/whl/cpu 'torch>=2.4'
+          pip install 'pytest>=8.0'
+      - name: Run reference tests
+        run: PYTHONPATH=. pytest tests/test_reference.py -v

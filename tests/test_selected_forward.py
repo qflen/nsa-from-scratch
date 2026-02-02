@@ -1,6 +1,6 @@
 """Correctness for the Triton selected-branch forward against the
-reference. block_indices is precomputed and shared so we are not
-chasing topk tie-breaking. Tol: 1e-2 rel for out, abs for lse.
+reference. block_indices is precomputed and shared to avoid chasing
+topk tie-breaking. Tol: 1e-2 rel for out, abs for lse.
 """
 
 from __future__ import annotations
@@ -54,7 +54,7 @@ def _causal_block_legal_mask(n_q, n_kv, block_size_m, block_size_n, Tq, Tk, devi
 
 def _shared_topk_indices(block_scores, top_k, block_size_m, block_size_n, Tq, Tk, causal):
     """Compute the same top-k indices the kernel uses, with causal masking applied,
-    so we can hand identical block_indices to both the reference and the kernel.
+    so identical block_indices can be passed to both the reference and the kernel.
 
     Returns int64 indices on the same device.
     """
@@ -76,8 +76,8 @@ def _reference_with_fixed_indices(
     """A direct port of selected_attention_reference but accepting block_indices
     instead of recomputing them. This eliminates any disagreement caused by
     tie-breaking inside torch.topk between the reference's masking path and
-    the kernel wrapper's masking path. They use the same input here, but we
-    play it safe.
+    the kernel wrapper's masking path. They use the same input here, but the
+    test plays it safe.
     """
     import torch.nn.functional as F
 
@@ -228,9 +228,9 @@ def test_selected_topk_full_matches_full_attention(dtype):
 
 
 def test_selected_kernel_matches_reference_via_block_scores():
-    """End-to-end path: pass block_scores, let the wrapper do top-k. Make sure
-    we still match the original selected_attention_reference (which does the
-    same top-k). This is the realistic call path from the NSA forward.
+    """End-to-end path: pass block_scores, let the wrapper do top-k. Confirm
+    the output still matches the original selected_attention_reference (which
+    does the same top-k). This is the realistic call path from the NSA forward.
     """
     B, H, Tq, Tk, D = 1, 8, 1024, 2048, 64
     BM = BN = 64

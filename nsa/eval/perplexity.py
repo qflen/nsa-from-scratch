@@ -118,7 +118,7 @@ def main():
     )
     p.add_argument(
         "--skip_examples", type=int, default=10_000_000,
-        help="offset into FineWeb-Edu so we hit a held-out portion",
+        help="offset into FineWeb-Edu so the eval hits a held-out portion",
     )
     p.add_argument("--out", required=True, help="output JSON path")
     args = p.parse_args()

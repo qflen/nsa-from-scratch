@@ -46,7 +46,7 @@ __device__ __forceinline__ void wgmma_wait() {
 // WGMMA atom variants. tnspA / tnspB control whether the operand's
 // K-of-MMA-axis is the inner (= 0, "K-major") or outer (= 1, "MN-major")
 // axis of the smem layout. f32 += bf16 * bf16 SS form, with predicated
-// scale-D so we always accumulate (predicate p set from input scaleD).
+// scale-D so the kernel always accumulates (predicate p set from input scaleD).
 //
 // Naming: T = K-major (tnsp 0), N = MN-major (tnsp 1). Suffix _AB.
 // ---------------------------------------------------------------------------
@@ -320,7 +320,7 @@ store_frag_to_smem_kmajor(__nv_bfloat16* smem,
 // r1 = r0 + 8.
 //
 // row_ptrs is indexed in the fragment's M-axis (= BLOCK_M_FRAG, in
-// {64} for our use). row_valid masks out-of-range rows.
+// {64} for this kernel). row_valid masks out-of-range rows.
 template <int BLOCK_M_FRAG, int N_FRAG>
 __device__ __forceinline__ void
 atomic_add_frag_rows(float* const* row_ptrs,
@@ -590,7 +590,7 @@ void selected_attn_bwd_kernel(
         // Each ks covers 16 K-elements = 2 cores along the K-axis. The
         // K-axis is the operand's INNER axis when tnsp = 0 (then K-step =
         // 2*LBO = 256) and OUTER axis when tnsp = 1 (then K-step = 2*SBO).
-        // For our smem layouts:
+        // For the smem layouts here:
         //   sP, sdS  : LBO = 128, SBO = 128 * (BLOCK_N/8) = 1024.
         //              tnsp=0 K-step = 256;   tnsp=1 K-step = 2048.
         //   sdO, sQ  : LBO = 128, SBO = 128 * (D/8).

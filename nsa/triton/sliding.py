@@ -75,8 +75,8 @@ def _sliding_fwd(
     if end_kv > Tk:
         end_kv = Tk
 
-    # Snap start to a BLOCK_N boundary so the inner loop is aligned and we can
-    # rely on tile-uniform pointers. We then mask off out-of-window columns
+    # Snap start to a BLOCK_N boundary so the inner loop is aligned and
+    # tile-uniform pointers hold. Out-of-window columns are masked off
     # with the per-element mask anyway.
     start_kv_aligned = (start_kv // BLOCK_N) * BLOCK_N
 
@@ -167,8 +167,8 @@ def sliding_attention(
     sm_scale = float(scale) if scale is not None else 1.0 / math.sqrt(D)
 
     # Triton's tl.dot needs the head dim to be a power of two and at least 16.
-    # Padding the runtime D to the next pow2 lets us keep BLOCK_D as a constexpr
-    # while still supporting odd head dims. For NSA we use D in (32, 64, 128).
+    # Padding the runtime D to the next pow2 keeps BLOCK_D as a constexpr
+    # while still supporting odd head dims. For NSA, D is in (32, 64, 128).
     assert D in (16, 32, 64, 128, 256), f"unsupported head dim D={D}"
 
     # Make tensors contiguous to keep the strides predictable.

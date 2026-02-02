@@ -1,7 +1,7 @@
 """Hand-written Triton backward for the NSA selected branch. FA-2 bwd
 (Dao 2023) adapted to the top-k gather: dQ local, dK/dV via atomic_add
 in fp32 buffers cast back at the end. Pre-step D = (dO*O).sum(-1) in
-fp32 lets us compute dS = P*(dP - D) per tile.
+fp32 to compute dS = P*(dP - D) per tile.
 """
 
 from __future__ import annotations

@@ -70,8 +70,8 @@ def _pad(Q, K, V, dO, BM, BN):
     """Pad Q/dO to multiple of BM, K/V to multiple of BN.
 
     The CUDA backward (and Triton backward) take already-padded inputs;
-    this helper performs that padding so we can drive both with the
-    same tensors. We zero-pad: the kernels mask Q-padding via the
+    this helper performs that padding so both can be driven with the
+    same tensors. Zero-pad: the kernels mask Q-padding via the
     Q_rows_valid check inside the WGMMA loops.
     """
     B, H, Tq, D = Q.shape

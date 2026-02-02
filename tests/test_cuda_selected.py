@@ -66,7 +66,7 @@ def _max_rel(out, ref):
 def _pad_qkv(Q, K, V, BM, BN):
     """Pad Q to multiple of BM and K/V to multiple of BN (the CUDA wrapper
     requires the caller to pad; the Triton wrapper does it internally
-    so we mimic that shape here for the CUDA call)."""
+    so the same shape is mimicked here for the CUDA call)."""
     import torch.nn.functional as F
 
     B, H, Tq, D = Q.shape
@@ -85,8 +85,8 @@ def _pad_qkv(Q, K, V, BM, BN):
 # Build sanity check.
 # ---------------------------------------------------------------------------
 def test_extension_loads():
-    # Importing the package triggers JIT compile lazily, but we want to
-    # surface compile errors cleanly. Force the extension to load.
+    # Importing the package triggers JIT compile lazily; force the
+    # extension to load to surface compile errors cleanly.
     from nsa.cuda import _get_ext
     ext = _get_ext()
     assert hasattr(ext, "selected_attention_fwd_cuda")
