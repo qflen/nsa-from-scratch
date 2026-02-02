@@ -299,7 +299,7 @@ def nsa_attention_reference(
     """Combined NSA reference: run all three branches and combine via per-head gates.
 
     gates: [B, H, Tq, 3] in branch order (compressed, selected, sliding) or None
-    (uniform 1/3 gating). gate_activation in cfg controls how gates are
+    (no-gate default: zero logits, matching nsa_forward). gate_activation in cfg controls how gates are
     normalized: "sigmoid" applies sigmoid elementwise (independent branches),
     "softmax" applies softmax across the 3 branches (mutually exclusive).
     """
@@ -330,7 +330,7 @@ def nsa_attention_reference(
 
     B, H, Tq, _ = Q.shape
     if gates is None:
-        gates = Q.new_full((B, H, Tq, 3), 1.0 / 3.0)
+        gates = Q.new_full((B, H, Tq, 3), 0.0)
     if cfg.gate_activation == "sigmoid":
         g = torch.sigmoid(gates)
     elif cfg.gate_activation == "softmax":

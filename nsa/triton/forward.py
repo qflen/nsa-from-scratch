@@ -375,7 +375,7 @@ def nsa_forward(
         cfg: NSAConfig carrying block sizes, top_k, window_size, gate
             activation, and causality.
         gate_logits: [B, H, Tq, 3] pre-activation per-branch scores. If None,
-            uniform 1/3 gating is applied (no learning).
+            the gate logits default to zero (sigmoid(0) = 0.5 per branch under the default sigmoid activation; no learning).
         block_indices: optional precomputed [B, H, n_q_blocks, k] int32
             indices. If None, derived from mean-pool Q.K scoring.
 
