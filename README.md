@@ -49,7 +49,7 @@ python -m nsa.eval.perplexity \
     --run_dir runs/nsa-100m-1b-32k \
     --seq_lens 2048,4096,8192,16384,32768 \
     --num_sequences_per_len 32 \
-    --out writeup/figures/data/perplexity_nsa-100m.json
+    --out writeup/figures/data/perplexity_nsa-100m-1b-32k.json
 ```
 
 The eval streams a deterministic offset of FineWeb-Edu, packs into the target seq_len, and reports cross-entropy and perplexity per cell.

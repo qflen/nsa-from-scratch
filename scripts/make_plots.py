@@ -10,6 +10,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from matplotlib.ticker import FixedLocator, NullFormatter, ScalarFormatter
 
 DATA_DIR = Path("writeup/figures/data")
 FIG_DIR = Path("writeup/figures")
@@ -165,24 +166,31 @@ def plot_scaling_trend():
     if nsa_pts:
         xs, ys, names = zip(*nsa_pts)
         ax.plot([x / 1e6 for x in xs], ys, "o-", color="tab:blue",
-                linewidth=1.5, markersize=10, label="NSA, 32k context")
+                linewidth=1.5, markersize=9, label="NSA, 32k context",
+                zorder=2)
         for x, y, n in nsa_pts:
             ax.annotate(n.split("-")[1].upper(), xy=(x / 1e6, y),
-                        xytext=(8, -3), textcoords="offset points", fontsize=9)
+                        xytext=(10, -3), textcoords="offset points", fontsize=9)
     if dense_pts:
         xs, ys, names = zip(*dense_pts)
         ax.scatter([x / 1e6 for x in xs], ys, color="tab:red", marker="s",
-                   s=80, label="dense-100M, 8k context")
+                   s=80, label="dense-100M, 8k context", zorder=3)
     if long_pts:
         xs, ys, names = zip(*long_pts)
         ax.scatter([x / 1e6 for x in xs], ys, color="tab:purple", marker="D",
-                   s=80, label="NSA-100M, 64k context")
+                   s=80, label="NSA-100M, 64k context", zorder=3)
 
     ax.set_xscale("log")
+    ax.xaxis.set_major_locator(FixedLocator([100, 150, 200, 300]))
+    ax.xaxis.set_major_formatter(ScalarFormatter())
+    ax.xaxis.set_minor_formatter(NullFormatter())
+    ax.set_xlim(90, 330)
+    all_ys = [p[1] for p in nsa_pts + dense_pts + long_pts]
+    ax.set_ylim(min(all_ys) * 0.97, max(all_ys) * 1.04)
     ax.set_xlabel("parameters (M, log scale)")
     ax.set_ylabel("final training cross-entropy")
     ax.set_title("Scaling trend: final train loss vs model size")
-    ax.legend(loc="upper left", fontsize=9, frameon=False)
+    ax.legend(loc="lower right", fontsize=9, frameon=False)
     ax.grid(True, alpha=0.3, which="both")
     fig.tight_layout()
     fig.savefig(FIG_DIR / "05_scaling_trend.png", dpi=150, bbox_inches="tight")

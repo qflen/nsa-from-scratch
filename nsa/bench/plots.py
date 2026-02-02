@@ -94,9 +94,12 @@ def plot_memory(rows: list[dict], out_path: Path):
     ax.set_xlabel("sequence length (tokens)")
     ax.set_ylabel("peak GPU memory (GB), log scale")
     ax.set_title("NSA forward memory vs full attention (H100, B=1, H=16, D=64)")
-    ax.axhline(80, color="k", linestyle="--", alpha=0.3, linewidth=1)
-    ax.text(1100, 80, " H100 NVL 80 GB", color="k", alpha=0.6, fontsize=8, va="bottom")
-    ax.legend(frameon=False, loc="upper left")
+    ax.axhline(80, color="k", linestyle="--", alpha=0.3, linewidth=1, zorder=1)
+    ax.text(2**13, 80, "H100 NVL 80 GB", color="k", alpha=0.6, fontsize=9,
+            ha="left", va="bottom")
+    leg = ax.legend(loc="upper left", frameon=True, framealpha=1.0,
+                    edgecolor="none", facecolor="white")
+    leg.set_zorder(5)
     ax.grid(True, which="both", linestyle=":", alpha=0.4)
     fig.tight_layout()
     fig.savefig(out_path, dpi=140)
