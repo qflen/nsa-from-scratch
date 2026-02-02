@@ -1,6 +1,11 @@
 """Correctness for the Hopper WGMMA selected-branch backward vs the
 Triton bwd at the same inputs. Skipped off Hopper. Headline shape asserts
 1e-3 rel; sweep uses 1e-2 (bwd amplifies atomic-add nondeterminism).
+
+selected_backward_cuda dispatches to the Triton bwd for now, so the
+non-xfail tests here exercise that dispatch path; the native WGMMA kernel
+is driven directly by the xfail test, which tracks its known tnsp=1
+divergence until the descriptor encoding is verified against CUTLASS.
 """
 
 from __future__ import annotations
@@ -20,7 +25,7 @@ if _cap[0] < 9:
 
 from nsa.triton.selected import selected_attention as triton_selected
 from nsa.triton.backward import selected_backward as triton_selected_bwd
-from nsa.cuda import selected_backward_cuda
+from nsa.cuda import selected_backward_cuda, _selected_backward_cuda_native
 
 
 def _make_qkv_do(B, H, Tq, Tk, D, dtype=torch.bfloat16, seed=0):
@@ -268,3 +273,48 @@ def test_cuda_bwd_padded_shapes():
     for name, c, t in (("dQ", dQc, dQt), ("dK", dKc, dKt), ("dV", dVc, dVt)):
         rel = _max_rel(c, t)
         assert rel < 1e-2, f"padded {name} rel err {rel}"
+
+
+# ---------------------------------------------------------------------------
+# Native CUDA backward (tnsp=1 WGMMA): tracked-divergence xfail. The
+# dispatcher selected_backward_cuda falls back to Triton, so every test
+# above compares Triton-vs-Triton and cannot see the native gap. This case
+# drives _selected_backward_cuda_native directly so the documented O(1)
+# divergence is tracked; drop the xfail once the descriptor encoding is
+# verified against CUTLASS and the native bwd lands.
+# ---------------------------------------------------------------------------
+@pytest.mark.xfail(strict=True, reason="WGMMA tnsp=1 descriptor encoding diverges from the Triton bwd by O(1); dispatch falls back to Triton")
+def test_cuda_bwd_native_tnsp1_diverges():
+    B, H, Tq, Tk, D, top_k = 1, 8, 1024, 2048, 64, 8
+    BM, BN = 64, 64
+    dtype = torch.bfloat16
+
+    Q, K, V, dO = _make_qkv_do(B, H, Tq, Tk, D, dtype, seed=0)
+    n_q = Tq // BM
+    n_kv = Tk // BN
+    bs = _make_block_scores(B, H, n_q, n_kv, seed=1)
+    indices = _shared_topk_indices(bs, top_k=top_k, BM=BM, BN=BN, Tq=Tq, Tk=Tk, causal=True)
+
+    Qp, Kp, Vp, dOp, Tq0, Tk0, pad_q, pad_k = _pad(Q, K, V, dO, BM, BN)
+    O_p, LSE_p = _run_fwd_for_O_LSE(Qp, Kp, Vp, indices, BM, BN, top_k, causal=True)
+    scale = 1.0 / math.sqrt(D)
+
+    dQt, dKt, dVt = triton_selected_bwd(
+        dOp, Qp, Kp, Vp, O_p, LSE_p, indices,
+        block_size_m=BM, block_size_n=BN,
+        causal=True, scale=scale,
+        Tq=Tq0, Tk=Tk0,
+    )
+    dQc, dKc, dVc = _selected_backward_cuda_native(
+        dOp, Qp, Kp, Vp, O_p, LSE_p, indices,
+        block_size_n=BN, block_size_m=BM, top_k=top_k,
+        causal=True, scale=scale,
+    )
+
+    rq = _max_rel(dQc, dQt)
+    rk = _max_rel(dKc, dKt)
+    rv = _max_rel(dVc, dVt)
+    # Expected to FAIL today (native tnsp=1 diverges by O(1)); the xfail tracks it.
+    assert rq < 1e-3 and rk < 1e-3 and rv < 1e-3, (
+        f"native bwd diverges: rel(dQ)={rq:.3e} rel(dK)={rk:.3e} rel(dV)={rv:.3e}"
+    )

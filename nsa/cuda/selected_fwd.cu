@@ -502,7 +502,14 @@ void selected_attn_fwd_kernel(
             acc[(ib << 2) + 3] *= alpha_r1;
         }
 
-        // Store P (bf16) into smem.
+        // Store P (bf16) into smem, then read it back for WGMMA #2 below:
+        // this is the SS variant of the second MMA (both operands in smem).
+        // The RS variant keeps P in registers as the MMA-A operand and skips
+        // this smem round-trip; it is the standard FA-2 production trick and
+        // the obvious next perf win here, but it needs the fp32 P fragment
+        // mapped to the MMA-A register layout under tnspA == Major::K (the
+        // descA path is bypassed for a register-resident A), which is fiddly
+        // enough to defer. SS keeps this kernel correct and simple meanwhile.
         store_p_to_smem(sP, p_frag, BLOCK_M, BLOCK_N, tid);
         __syncthreads();
 

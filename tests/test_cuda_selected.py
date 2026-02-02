@@ -218,3 +218,45 @@ def test_cuda_causal_off_matches_triton():
     assert rel < 1e-2, f"causal=False: out rel err {rel}"
     diff = (lse_c.float() - lse_t.float()).abs()
     assert float(diff.max()) < 1e-2
+
+
+# ---------------------------------------------------------------------------
+# Writeup headline shape (post.md): B=1, H=8, Tq=4096, Tk=8192, D=64, top_k=16.
+# Backs the cited rel(out) = 6.07e-4, below the 1e-3 quality gate.
+# ---------------------------------------------------------------------------
+def test_cuda_fwd_writeup_headline_shape():
+    B, H, Tq, Tk, D, top_k = 1, 8, 4096, 8192, 64, 16
+    BM, BN = 64, 64
+    dtype = torch.bfloat16
+
+    Q, K, V = _make_qkv(B, H, Tq, Tk, D, dtype, seed=8)
+    n_q = Tq // BM
+    n_kv = Tk // BN
+    bs = _make_block_scores(B, H, n_q, n_kv, seed=9)
+    indices = _shared_topk_indices(bs, top_k=top_k, BM=BM, BN=BN, Tq=Tq, Tk=Tk, causal=True)
+
+    out_t, lse_t = triton_selected(
+        Q, K, V, block_size_n=BN, block_size_m=BM, top_k=top_k,
+        block_indices=indices, causal=True,
+    )
+
+    Qp, Kp, Vp, Tq_orig, Tk_orig, pad_q, pad_k = _pad_qkv(Q, K, V, BM, BN)
+    out_c, lse_c = selected_attention_cuda(
+        Qp, Kp, Vp, indices,
+        block_size_n=BN, block_size_m=BM, top_k=top_k,
+        causal=True, scale=None,
+    )
+    if pad_q:
+        out_c = out_c[:, :, :Tq_orig, :]
+        lse_c = lse_c[:, :, :Tq_orig]
+
+    assert out_c.shape == out_t.shape
+    rel = _max_rel(out_c, out_t)
+    # Writeup cites rel(out) = 6.07e-4 at this exact shape; gate at the 1e-3 bar.
+    assert rel < 1e-3, f"out rel err {rel} above the 1e-3 writeup gate"
+
+    finite = torch.isfinite(lse_c) & torch.isfinite(lse_t)
+    diff = (lse_c.float() - lse_t.float()).abs()[finite]
+    if diff.numel() > 0:
+        assert float(diff.max()) < 1e-2, f"lse diff {float(diff.max())}"
+    print(f"writeup shape: rel(out)={rel:.4e}")
