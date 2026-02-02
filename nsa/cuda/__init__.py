@@ -130,7 +130,7 @@ def _selected_backward_cuda_native(
     *, block_size_n: int, block_size_m: int, top_k: int,
     causal: bool, scale: float,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Direct dispatch to the hand-written CUDA backward (in-progress)."""
+    """Hand-written CUDA backward, in-tree for diagnostics only: the WGMMA tnsp=1 descriptor encoding diverges from the Triton bwd until verified against CUTLASS source."""
     assert Q.dtype == torch.bfloat16
     assert Q.is_cuda
     B, H, Tq_p, D = Q.shape
