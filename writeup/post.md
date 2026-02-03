@@ -1,6 +1,6 @@
 # NSA from scratch
 
-DeepSeek's Native Sparse Attention (Yuan et al., February 2025, [arXiv 2502.11089](https://arxiv.org/abs/2502.11089)) reimplemented from the kernel up. All three branches in Triton, the selected branch additionally in CUDA C++ on Hopper with WGMMA, multi-precision support across FP16, BF16, and FP8, a 48-config autotune sweep, three NSA scaling points trained end to end alongside a dense baseline and a long-context training point, and a perplexity sweep showing the long-context stability claim holds at training-budget scale. The headline: at 64k context the Triton NSA forward runs **7.4x faster than FlashAttention-3** at the same batch shape, and a 100M-parameter NSA model's perplexity stays essentially flat from 2k to 32k evaluation context. The rest of this post covers how the kernel design produces that, what training validates, and the surprises along the way.
+DeepSeek's Native Sparse Attention (Yuan et al., February 2025, [arXiv 2502.11089](https://arxiv.org/abs/2502.11089)) reimplemented from the kernel up. All three branches in Triton, the selected branch additionally in CUDA C++ on Hopper with WGMMA, multi-precision support across FP16, BF16, and FP8, a 48-config autotune sweep, three NSA scaling points trained end to end alongside a dense baseline and a long-context training point, and a perplexity sweep showing the long-context stability claim holds at training-budget scale. The headline: at 64k context the Triton NSA forward runs **7.07x faster than FlashAttention-3** (95% bootstrap CI 7.05x to 7.09x across 3 seeds, 100 iters each) at B=1, H=16, D=64, bf16, and a 100M-parameter NSA model's perplexity stays essentially flat from 2k to 32k evaluation context. The 7x ratio is the long-context tail of the curve, not the typical regime: at 8k context and below, FA-3 is faster by a clear margin. The rest of this post covers how the kernel design produces that, what training validates, where the win does and does not hold, and the surprises along the way.
 
 ## Why NSA matters in five minutes
 
@@ -45,23 +45,77 @@ P is staged to smem between WGMMAs (the SS variant of the second MMA). The RS va
 
 Correctness vs Triton at the headline shape (B=1, H=8, T_q=4096, T_k=8192, D=64, top_k=16): `rel(out) = 6.07e-4`, `max |lse_diff| = 9.54e-7`. Comfortably below the 1e-3 quality gate.
 
-The throughput on H100 NVL, forward-only, B=1, H=16, D=64, bf16, averaged over 30 iterations with 5-iteration warmup:
+The throughput on H100 NVL, forward-only, B=1, H=16, D=64, bf16, three seeds at 100 iterations each (25-iter warmup per seed), mean ms with a 95% bootstrap CI on the pooled 300 per-iter samples:
 
-|  T   | NSA tok/s | FA-3 tok/s | SDPA tok/s | NSA / FA-3 |
-|-----:|----------:|-----------:|-----------:|-----------:|
-|  1k  |  2.0M     | 20.2M      | 40.1M      |  0.10x     |
-|  2k  |  4.0M     | 30.1M      | 29.4M      |  0.13x     |
-|  4k  |  8.3M     | 19.5M      | 18.8M      |  0.43x     |
-|  8k  | 13.4M     | 11.9M      | 10.6M      |  1.12x     |
-| 16k  | 13.1M     |  5.9M      |  5.6M      |  2.23x     |
-| 32k  | 12.3M     |  3.0M      |  2.8M      |  4.05x     |
-| 64k  | 11.1M     |  1.5M      |  1.5M      | **7.40x**  |
+|   T   | NSA ms (95% CI)        | FA-3 ms (95% CI)         | SDPA ms (95% CI)         | NSA tok/s     | NSA / FA-3 |
+|------:|-----------------------:|-------------------------:|-------------------------:|--------------:|-----------:|
+|  1k   | 0.502 [0.499, 0.509]   |  0.068 [0.067, 0.068]    |  0.034 [0.034, 0.034]    |   2.04M       |  0.13x     |
+|  2k   | 0.505 [0.501, 0.511]   |  0.111 [0.110, 0.111]    |  0.079 [0.079, 0.079]    |   4.05M       |  0.22x     |
+|  4k   | 0.614 [0.610, 0.621]   |  0.254 [0.253, 0.255]    |  0.231 [0.230, 0.232]    |   6.67M       |  0.41x     |
+|  8k   | 0.812 [0.811, 0.813]   |  0.778 [0.773, 0.783]    |  0.787 [0.785, 0.790]    |  10.09M       |  0.96x     |
+| 16k   | 1.289 [1.287, 1.292]   |  2.879 [2.872, 2.887]    |  2.973 [2.966, 2.981]    |  12.71M       |  2.23x     |
+| 32k   | 2.662 [2.657, 2.670]   | 11.006 [10.974, 11.037]  | 11.061 [11.041, 11.082]  |  12.31M       |  4.13x     |
+| 64k   | 6.043 [6.033, 6.053]   | 42.732 [42.667, 42.801]  | 43.174 [43.134, 43.214]  |  10.84M       | **7.07x**  |
 
-NSA flattens at roughly 12M tok/s from 8k onward; FA-3 drops off quadratically as expected. Crossover at 8k. At 64k the NSA forward is 7.4x faster, which is the headline plot of the post. Torch SDPA dispatches to FA-3 internally on Hopper so its line almost coincides with FA-3's; the naive O(T^2) baseline OOMs at 32k on the 94 GB H100 NVL and shoots through the memory plot's log axis.
+NSA's mean wall time scales sublinearly with T, peaking at ~12.7M tok/s at 16k and settling around 10.8M tok/s at 64k as the per-branch costs of compressed and sliding catch up. FA-3 and torch SDPA scale linearly in T (constant tokens/s drift downward as launch overhead amortizes); SDPA dispatches to the FA-3 backend on Hopper, so its line almost coincides with FA-3's. The naive O(T^2) memory baseline OOMs at 32k on the 94 GB H100 NVL and shoots through the memory plot's log axis.
 
 ![throughput](figures/01_throughput.png)
 
 ![memory](figures/02_memory.png)
+
+### Crossover: where FA-3 wins, and where NSA flips
+
+The 95% bootstrap CIs are tight (FA-3 spans about 0.2% of the mean, NSA about 0.4%), so the per-seq-len verdict is unambiguous at every point. There is no "tie" regime at this batch shape:
+
+|   T   | NSA tps CI                       | FA-3 tps CI                      | Verdict       |
+|------:|---------------------------------:|---------------------------------:|:--------------|
+|  1k   |   [2.012M, 2.054M]               |  [14.97M, 15.32M]                | FA-3 wins     |
+|  2k   |   [4.008M, 4.084M]               |  [18.43M, 18.57M]                | FA-3 wins     |
+|  4k   |   [6.601M, 6.710M]               |  [16.07M, 16.21M]                | FA-3 wins     |
+|  8k   |  [10.074M, 10.096M]              |  [10.47M, 10.60M]                | FA-3 wins     |
+| 16k   |  [12.683M, 12.729M]              |  [5.676M, 5.704M]                | NSA wins      |
+| 32k   |  [12.272M, 12.334M]              |  [2.969M, 2.986M]                | NSA wins      |
+| 64k   |  [10.826M, 10.862M]              |  [1.531M, 1.536M]                | NSA wins      |
+
+The flip is between 8k and 16k. At 8k NSA's upper CI bound (10.10M tok/s) is below FA-3's lower CI bound (10.47M tok/s); at 16k NSA's lower bound (12.68M tok/s) is more than 2x FA-3's upper bound (5.70M tok/s). Practically: if your batches live at 8k or shorter, FA-3 is the right call. The NSA kernel earns its keep at 16k and beyond, with the win growing roughly linearly in T as FA-3 pays its O(T^2) score-tile cost.
+
+### Per-branch latency breakdown
+
+Forward latency split across the three branches plus the scoring step (mean-pooled Q.K + top-k for block-indices) and the final gated combine. Same shape as above, 3 seeds, 50 iters each, with `torch.cuda.synchronize()` + `time.perf_counter()` brackets around each branch:
+
+|   T   | total ms | compressed | score    | selected | sliding  | combine  |
+|------:|---------:|-----------:|---------:|---------:|---------:|---------:|
+|  4k   |   0.76   | 0.09 (12%) | 0.24 (31%) | 0.19 (25%) | 0.11 (15%) | 0.09 (12%) |
+| 16k   |   1.50   | 0.17 (11%) | 0.30 (20%) | 0.47 (31%) | 0.29 (19%) | 0.24 (16%) |
+| 64k   |   6.07   | 1.13 (19%) | 1.01 (17%) | 1.88 (31%) | 1.10 (18%) | 0.89 (15%) |
+
+![per-branch](figures/07_branch_breakdown.png)
+
+The selected branch is the largest single line item at every seq_len (~31%), which is the expected outcome and the reason the CUDA WGMMA version of the selected branch was written. Block-index scoring (the mean-pool Q.K + top-k) sits at 17 to 31% across the sweep: cheap relative to selected at long context, but at 4k it is the largest line item, which is a useful warning for anyone planning to launch the selected kernel from a hot path without amortizing the score over many query blocks. Sliding and combine together are about a third of the budget at long context, which is the cost ceiling for the natural follow-up of hand-written Triton sliding-bwd and compressed-bwd kernels.
+
+The pattern visible in the chart and table together: as T grows from 4k to 64k, total latency grows ~8x, but the relative shares stay within a 3:2 ratio. No single branch will explode under longer context; the selected kernel paces the curve.
+
+### Where dense wins (or runs at all)
+
+A batch-size sweep at fixed seq_lens identifies the OOM frontier for NSA vs torch SDPA (which dispatches to FA-3 internally on Hopper). For each (impl, seq_len) the sweep doubles batch_size from 1 until OOM, then binary-searches the gap for the precise max-tolerable batch. NSA's Triton kernels use int32 strides, which overflow when `batch * H * T * D > 2^31`; the NSA cap below is the int32-safe bound, not an OOM, and is visible as a flat ceiling on the curve at long T:
+
+|   T   | NSA max batch                       | SDPA max batch  | NSA peak (GB) at max | SDPA peak (GB) at max |
+|------:|:------------------------------------|:---------------:|---------------------:|----------------------:|
+|  4k   | 256 (int32 cap = 512, OOM not hit)  |   256           | 18.23                |    8.09               |
+|  8k   | 256 (int32 cap = 256, OOM not hit)  |   256           | 36.44                |   16.16               |
+| 16k   | 128 (int32 cap, OOM not hit)        |   256           | 72.84                |   32.28               |
+| 32k   |  64 (int32 cap, OOM not hit)        |   256           | 36.44                |   64.50               |
+| 64k   |  32 (int32 cap, OOM not hit)        |   183 (OOM=192) | 18.23                |   92.21               |
+
+Two readings.
+
+One: NSA's per-batch memory is roughly 2x SDPA's at the same shape (extra compressed / selected output buffers, plus the [B, H, n_q_blocks, n_kv_blocks] fp32 score matrix for top-k). At T=4k B=8 NSA uses 0.60 GB and SDPA uses 0.28 GB; the ratio holds across the sweep. NSA is not "lower memory than dense"; it is lower latency than dense at long context.
+
+Two: at T=64k SDPA actually reaches a larger batch than NSA before OOM (183 vs 32). NSA's batch cap there is the int32 stride limit in the Triton kernels, hit at `B*H*T*D = 32 * 16 * 65536 * 64 = 2^31`, well before NSA's memory footprint would have OOMed (32 batches use 18 GB out of 94 GB available). This is a real bug in the kernel: lifting the strides to int64 is straightforward and is the natural follow-up.
+
+![memory sweep](figures/08_memory_sweep.png)
+
+The narrative the original post wanted to tell here ("dense OOMs at 64k, NSA tolerates X times the batch") is true only for the *naive* O(T^2) memory baseline, which OOMs at 32k batch=1. Against an FA-backend SDPA, the dense path comfortably reaches batch=183 at 64k. The NSA win is wall-clock latency, not memory headroom.
 
 ## Training validation
 
@@ -120,6 +174,20 @@ Four things that were not expected at the start.
 **The WGMMA tnsp=1 atom is harder to land than the tnsp=0 atom:** the forward kernel uses only `tnspA=0, tnspB=0` (both operands K-major in smem). The backward needs three additional configurations for `m64n64k16` and `m64n128k16` with `tnspA=1` (M-major) or `tnspB=1` (N-major). The PTX form is documented and the CUTLASS sm_90 atom table lists all four trans combinations as supported. The descriptor encoding (LBO, SBO, start_address) under tnsp=1 has not yet been verified against CUTLASS source, and the result is a kernel that compiles and runs cleanly (after an 8 KB tail-padding fix that avoids a boundary read past the last allocation of dynamic smem) but produces values that diverge from the Triton backward by O(1). The backward dispatch falls back to the Triton path for correctness while that landing continues; the CUDA kernel is in the tree as `_selected_backward_cuda_native` for diagnostics. The forward CUDA kernel is unaffected and matches Triton at 6e-4 on the same headline shape.
 
 **Dense-100M at 8k context lands above NSA-100M at 32k context on a matched recipe:** same parameter count, same 1B-token budget, same Llama-style architecture, same AdamW recipe. The only difference is the attention path: full attention for dense, NSA's three-branch gather for NSA-100M, both with bf16 mixed precision. Dense is the configuration that benefits from a shorter training context (its O(T^2) attention forces the 8k cap on A100 PCIe at this batch shape, while NSA runs comfortably at 32k); even so, the NSA model ends training with a lower cross-entropy. The implication is not that dense is broken; it is that NSA's sparsity pattern is not paying a meaningful loss tax even at the regime that favors the dense baseline, and the kernel design that makes NSA's 32k context affordable is doing real work rather than just compensating for a sparsity penalty.
+
+## Limitations
+
+Five constraints a reader should keep in mind before quoting numbers from this post.
+
+**Training budget is below Chinchilla.** The three NSA scaling points are 100M / 150M / 300M parameters at 1B / 1B / 500M tokens respectively. Chinchilla-optimal for these sizes is roughly 2B / 3B / 6B tokens. NSA-100M at 1B is the closest to optimal at ~50% of the recommended budget; NSA-300M at 500M is ~8% of optimal and the resulting final-loss point sits visibly above the scaling line (Plot 5). The kernels are validated; the scaling claim is best read as "the architecture trains stably end-to-end under matched recipes" rather than "these are converged checkpoints."
+
+**Training throughput is bottlenecked by the autograd-aware backward, not the forward kernels.** Inference throughput at 32k is ~12M tok/s; training throughput at the same shape is 7 to 16k tok/s per the wandb logs. The forward Triton kernels are not the limit; the compressed and sliding branches use a "Triton forward, reference autograd backward" path whose autograd graph materializes a (B, H, T_q, T_k/B_c) score matrix every step (compressed) and an O(T*W) chunked path per layer (sliding). Hand-written Triton bwd kernels for the compressed and sliding branches are the natural follow-up; with those landed the training throughput should return to a small constant multiple of the forward number rather than the current ~30 to 60x gap.
+
+**The 7.07x headline is the long-context tail, not the typical case.** At 4k context the same NSA kernel is 2.4x slower than FA-3 (0.41x). The ratio crosses 1.0 between 8k and 16k. The architecture pays a fixed per-call overhead for scoring + three-branch dispatch + gated combine; this is amortized at long context but not at short context. Workloads that live at <=8k should not adopt NSA on the basis of this number.
+
+**Per-batch memory is higher than FA-3, not lower.** The selected branch's gather output, the compressed branch output, the sliding branch output, and the score matrix all live in memory in addition to Q/K/V. At T=4k B=8 NSA uses 0.60 GB and SDPA uses 0.28 GB on the same shape; the 2x ratio is roughly stable across the sweep. NSA's structural advantage is wall-clock latency, not memory headroom.
+
+**NSA's int32 stride math caps batch_size at long context.** The Triton kernels carry int32 pointer strides; when `batch * H * T * D` crosses 2^31 the pointer arithmetic overflows and gives either silent wrong data or an illegal-memory-access crash. At T=64k H=16 D=64 the safe ceiling is batch=32. Lifting the strides to int64 is the obvious fix and is unrelated to the algorithm.
 
 ## What was cut and why
 
