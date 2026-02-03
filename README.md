@@ -1,7 +1,7 @@
 # nsa-from-scratch
 
 [![CI](https://img.shields.io/github/actions/workflow/status/qflen/nsa-from-scratch/ci.yml?branch=main&label=CI)](https://github.com/qflen/nsa-from-scratch/actions/workflows/ci.yml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch 2.4+](https://img.shields.io/badge/PyTorch-2.4+-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![Triton 3.0+](https://img.shields.io/badge/Triton-3.0+-9D4EDD.svg)](https://github.com/openai/triton)
@@ -108,4 +108,4 @@ scripts/                fetch_wandb.py, make_plots.py, multiseed_combine.py
 
 ## License
 
-Apache-2.0. See LICENSE.
+MIT. See LICENSE.

@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "From-scratch reimplementation of DeepSeek's Native Sparse Attention (Yuan et al. 2025) in Triton and CUDA"
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "Apache-2.0" }
+license = { text = "MIT" }
 authors = [{ name = "Kimon", email = "nkimon00@gmail.com" }]
 
 dependencies = [
