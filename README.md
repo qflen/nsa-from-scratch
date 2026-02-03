@@ -16,7 +16,7 @@ From-scratch reimplementation of DeepSeek's Native Sparse Attention (Yuan et al.
 
 | Result | Number | Hardware |
 |---|---|---|
-| NSA forward at 64k context vs FlashAttention-3 | **7.4x faster** (11.1M vs 1.5M tok/s) | H100 NVL, 94 GB |
+| NSA forward at 64k context vs FlashAttention-3 | **7.07x faster** (10.84M vs 1.53M tok/s) | H100 NVL, 94 GB |
 | NSA-100M perplexity, 2k to 32k evaluation context | flat (66.5 to 70.8 on a FineWeb-Edu held-out split) | (eval) |
 | NSA-100M trains stably at 64k context | 500M tokens, no loss spikes or divergence | A100 SXM, 80 GB |
 | Dense full attention at 64k context, same 100M params | OOMs the card at this batch shape | A100 PCIe, 80 GB |
@@ -43,12 +43,20 @@ Python, PyTorch, Triton, CUDA C++ (Hopper sm_90a, WGMMA inline-PTX), torch.utils
 
 ```bash
 pip install -e '.[dev,train]'
-pytest tests/ -q                              # 76 tests on H100 NVL, 63 on a 4090
-python -m nsa.bench.throughput --seq-lens 1024,2048,4096,8192,16384,32768,65536 \
-    --impls nsa,fa3,full_sdpa --dtype bf16 --out runs/throughput.json
+pytest tests/ -q                              # full suite; CUDA WGMMA tests are a Hopper-only subset, skipped on non-sm_90 cards
+# Headline throughput is a 3-seed protocol (100 iters, 25 warmup each),
+# pooled into a 95% bootstrap CI (this is what reports 7.07x at 64k):
+for s in 0 1 2; do
+  python -m nsa.bench.throughput --seq-lens 1024,2048,4096,8192,16384,32768,65536 \
+      --impls nsa,fa3,full_sdpa --dtype bf16 --warmup 25 --iters 100 --seed $s \
+      --out runs/throughput_seed$s.json
+done
+python scripts/multiseed_combine.py \
+    --seeds runs/throughput_seed0.json,runs/throughput_seed1.json,runs/throughput_seed2.json \
+    --out runs/throughput_multiseed.json
 ```
 
-The throughput benchmark needs a Hopper card (the WGMMA selected forward and the FA-3 baseline both require sm_90a). On a 4090 the suite still runs; the Hopper-only tests skip cleanly.
+The throughput benchmark needs a Hopper card (the WGMMA selected forward and the FA-3 baseline both require sm_90a). On a non-Hopper (sm_89) card the suite still runs; the Hopper-only tests skip cleanly.
 
 ## Reproducing the training runs
 
@@ -86,16 +94,16 @@ The eval streams a deterministic offset of FineWeb-Edu, packs into the target se
 ```
 nsa/
   reference.py          plain-torch reference for the three branches (correctness oracle)
-  triton/               compressed.py, selected.py, sliding.py, gating.py, forward.py, backward.py, fp8.py
-  cuda/                 selected_fwd.cu (Hopper WGMMA), selected_bwd.cu (in-progress), bindings.cpp
+  triton/               compressed.py, selected.py, sliding.py, gating.py, forward.py, backward.py, fp8.py, moba.py
+  cuda/                 selected_fwd.cu (Hopper WGMMA), selected_bwd.cu (in-progress), bindings.cpp, setup.py
   model/                llama_nsa.py, llama_dense.py, config.py
   train/                train.py, data.py, config_*.yaml (NSA-100M, 150M, 300M, dense, 64k, sanity)
   eval/                 perplexity.py, long_context_probe.py, longbench.py
-  bench/                throughput.py, memory.py, correctness.py, autotune.py, plots.py
+  bench/                throughput.py, memory.py, memory_sweep.py, correctness.py, branch_breakdown.py, autotune.py, plots.py
 tests/                  test_{compressed,selected,sliding,combined,fp8,training_step,cuda_selected,cuda_selected_bwd}_forward|backward.py
-writeup/                post.md, figures/{01..06}.png
+writeup/                post.md, figures/{01..08}.png
 notes/                  refs.bib
-scripts/                fetch_wandb.py, make_plots.py
+scripts/                fetch_wandb.py, make_plots.py, multiseed_combine.py
 ```
 
 ## License
