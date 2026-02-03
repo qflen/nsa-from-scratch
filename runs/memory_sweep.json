@@ -1,0 +1,587 @@
+[
+  {
+    "impl": "full_sdpa",
+    "seq_len": 16384,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.1259765625,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.251953125,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 0.50390625,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 1.0078125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 2.015625,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 4.03125,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 8.0625,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 16.125,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 32.25,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 32768,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.251953125,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.50390625,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 1.0078125,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 2.015625,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 4.03125,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 8.0625,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 16.125,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 32.25,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 64.5,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 4096,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.031494140625,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.06298828125,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 0.1259765625,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 0.251953125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 0.50390625,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 1.0078125,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 2.015625,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 4.03125,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 8.0625,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 65536,
+    "max_batch_ok": 183,
+    "first_batch_oom": 256,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.50390625,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 1.0078125,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 2.015625,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 4.03125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 8.0625,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 16.125,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 32.25,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 64.5,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": null,
+        "ok": false,
+        "note": "OOM"
+      },
+      {
+        "batch": 192,
+        "peak_gb": null,
+        "ok": false,
+        "note": "OOM",
+        "from": "binsearch"
+      },
+      {
+        "batch": 160,
+        "peak_gb": 80.625,
+        "ok": true,
+        "from": "binsearch"
+      },
+      {
+        "batch": 176,
+        "peak_gb": 88.6875,
+        "ok": true,
+        "from": "binsearch"
+      },
+      {
+        "batch": 184,
+        "peak_gb": null,
+        "ok": false,
+        "note": "OOM",
+        "from": "binsearch"
+      },
+      {
+        "batch": 180,
+        "peak_gb": 90.703125,
+        "ok": true,
+        "from": "binsearch"
+      },
+      {
+        "batch": 182,
+        "peak_gb": 91.7109375,
+        "ok": true,
+        "from": "binsearch"
+      },
+      {
+        "batch": 183,
+        "peak_gb": 92.21484375,
+        "ok": true,
+        "from": "binsearch"
+      }
+    ]
+  },
+  {
+    "impl": "full_sdpa",
+    "seq_len": 8192,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.06298828125,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.1259765625,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 0.251953125,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 0.50390625,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 1.0078125,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 2.015625,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 4.03125,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 8.0625,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 16.125,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 16384,
+    "max_batch_ok": 128,
+    "first_batch_oom": null,
+    "max_batch_tried": 128,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.315673828125,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.60009765625,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 1.1689453125,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 2.306640625,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 4.58203125,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 9.1328125,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 18.234375,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 36.4375,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 32768,
+    "max_batch_ok": 64,
+    "first_batch_oom": null,
+    "max_batch_tried": 64,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.60009765625,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 1.1689453125,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 2.306640625,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 4.58203125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 9.1328125,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 18.234375,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 36.4375,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 4096,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.10235595703125,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.1734619140625,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 0.315673828125,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 0.60009765625,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 1.1689453125,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 2.306640625,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 4.58203125,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 9.1328125,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 18.234375,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 65536,
+    "max_batch_ok": 32,
+    "first_batch_oom": null,
+    "max_batch_tried": 32,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 1.1689453125,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 2.306640625,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 4.58203125,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 9.1328125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 18.234375,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 36.4375,
+        "ok": true
+      }
+    ]
+  },
+  {
+    "impl": "nsa",
+    "seq_len": 8192,
+    "max_batch_ok": 256,
+    "first_batch_oom": null,
+    "max_batch_tried": 256,
+    "heads": 16,
+    "head_dim": 64,
+    "dtype": "bf16",
+    "steps": [
+      {
+        "batch": 1,
+        "peak_gb": 0.1734619140625,
+        "ok": true
+      },
+      {
+        "batch": 2,
+        "peak_gb": 0.315673828125,
+        "ok": true
+      },
+      {
+        "batch": 4,
+        "peak_gb": 0.60009765625,
+        "ok": true
+      },
+      {
+        "batch": 8,
+        "peak_gb": 1.1689453125,
+        "ok": true
+      },
+      {
+        "batch": 16,
+        "peak_gb": 2.306640625,
+        "ok": true
+      },
+      {
+        "batch": 32,
+        "peak_gb": 4.58203125,
+        "ok": true
+      },
+      {
+        "batch": 64,
+        "peak_gb": 9.1328125,
+        "ok": true
+      },
+      {
+        "batch": 128,
+        "peak_gb": 18.234375,
+        "ok": true
+      },
+      {
+        "batch": 256,
+        "peak_gb": 36.4375,
+        "ok": true
+      }
+    ]
+  }
+]

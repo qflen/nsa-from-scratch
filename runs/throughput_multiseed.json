@@ -1,0 +1,757 @@
+{
+  "cells": [
+    {
+      "impl": "fa3",
+      "seq_len": 1024,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.06767008036375045,
+        0.06893407993018627,
+        0.06600575994700193
+      ],
+      "mean_ms": 0.06753664008031289,
+      "stddev_across_seeds_ms": 0.001199199514373958,
+      "ci_lo_ms": 0.0668427734694754,
+      "ci_hi_ms": 0.06840485867547492,
+      "tokens_per_sec": 15162140.118049769,
+      "tps_ci_lo": 14969696.88743956,
+      "tps_ci_hi": 15319531.893266259,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 2048,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.10881855979561805,
+        0.11346751995384693,
+        0.10983775980770588
+      ],
+      "mean_ms": 0.11070794651905695,
+      "stddev_across_seeds_ms": 0.001995181916962106,
+      "ci_lo_ms": 0.11030089323781431,
+      "ci_hi_ms": 0.11111457068286835,
+      "tokens_per_sec": 18499123.72502965,
+      "tps_ci_lo": 18431426.116428856,
+      "tps_ci_hi": 18567392.700840674,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 4096,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.2530956794321537,
+        0.2550313597917557,
+        0.25316927939653394
+      ],
+      "mean_ms": 0.2537654395401478,
+      "stddev_across_seeds_ms": 0.0008956449450023675,
+      "ci_lo_ms": 0.25271068494270243,
+      "ci_hi_ms": 0.25495128019402424,
+      "tokens_per_sec": 16140889.821019063,
+      "tps_ci_lo": 16065814.601451864,
+      "tps_ci_hi": 16208258.0755487,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 8192,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.7401932811737061,
+        0.8184624010324478,
+        0.7744844824075698
+      ],
+      "mean_ms": 0.7777133882045746,
+      "stddev_across_seeds_ms": 0.032034701552638906,
+      "ci_lo_ms": 0.7726504331280788,
+      "ci_hi_ms": 0.7826888631135225,
+      "tokens_per_sec": 10533443.456479529,
+      "tps_ci_lo": 10466483.408761393,
+      "tps_ci_hi": 10602466.068432331,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 16384,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        2.8612768030166627,
+        2.8812569522857667,
+        2.8956326460838318
+      ],
+      "mean_ms": 2.879388800462087,
+      "stddev_across_seeds_ms": 0.014087783872117149,
+      "ci_lo_ms": 2.8721188726822535,
+      "ci_hi_ms": 2.886694590985775,
+      "tokens_per_sec": 5690096.452889822,
+      "tps_ci_lo": 5675695.673231937,
+      "tps_ci_hi": 5704499.26562374,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 32768,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        10.966117115020753,
+        11.001155586242676,
+        11.049310073852538
+      ],
+      "mean_ms": 11.005527591705322,
+      "stddev_across_seeds_ms": 0.034103791808935864,
+      "ci_lo_ms": 10.974269951899847,
+      "ci_hi_ms": 11.03707631587982,
+      "tokens_per_sec": 2977412.9160965155,
+      "tps_ci_lo": 2968902.185885438,
+      "tps_ci_hi": 2985893.3800263642,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "fa3",
+      "seq_len": 65536,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        42.58145137786865,
+        42.6656303024292,
+        42.95018016815185
+      ],
+      "mean_ms": 42.7324206161499,
+      "stddev_across_seeds_ms": 0.15776763441025182,
+      "ci_lo_ms": 42.66693023236593,
+      "ci_hi_ms": 42.80081148910522,
+      "tokens_per_sec": 1533636.5002274625,
+      "tps_ci_lo": 1531185.9219464082,
+      "tps_ci_hi": 1535990.5116934387,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 1024,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.03371839996427298,
+        0.0339929599314928,
+        0.033655680157244204
+      ],
+      "mean_ms": 0.03378901335100333,
+      "stddev_across_seeds_ms": 0.0001464675147565584,
+      "ci_lo_ms": 0.03370496001063536,
+      "ci_hi_ms": 0.03389151991686473,
+      "tokens_per_sec": 30305708.82205394,
+      "tps_ci_lo": 30214047.717890874,
+      "tps_ci_hi": 30381285.118774332,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 2048,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.07922848016023636,
+        0.0797647999972105,
+        0.07711904004216194
+      ],
+      "mean_ms": 0.07870410673320294,
+      "stddev_across_seeds_ms": 0.0011419973885459717,
+      "ci_lo_ms": 0.07852842130884527,
+      "ci_hi_ms": 0.07888288003951312,
+      "tokens_per_sec": 26021513.8066742,
+      "tps_ci_lo": 25962540.908421945,
+      "tps_ci_hi": 26079729.680868015,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 4096,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.23172255992889404,
+        0.23097600057721138,
+        0.23024927973747253
+      ],
+      "mean_ms": 0.23098261341452597,
+      "stddev_across_seeds_ms": 0.0006014822955675216,
+      "ci_lo_ms": 0.23020842122410734,
+      "ci_hi_ms": 0.23174819987267256,
+      "tokens_per_sec": 17732936.42950189,
+      "tps_ci_lo": 17674355.193483405,
+      "tps_ci_hi": 17792572.392530132,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 8192,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.7879836785793305,
+        0.7857027232646943,
+        0.7886704009771347
+      ],
+      "mean_ms": 0.7874522676070531,
+      "stddev_across_seeds_ms": 0.0012684836005565849,
+      "ci_lo_ms": 0.7851628526498875,
+      "ci_hi_ms": 0.7897200135787328,
+      "tokens_per_sec": 10403170.245346088,
+      "tps_ci_lo": 10373296.686349308,
+      "tps_ci_hi": 10433504.300862411,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 16384,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        2.962336642742157,
+        2.974470076560974,
+        2.983187518119812
+      ],
+      "mean_ms": 2.973331412474314,
+      "stddev_across_seeds_ms": 0.008550328178119333,
+      "ci_lo_ms": 2.965881918927034,
+      "ci_hi_ms": 2.9809183116952576,
+      "tokens_per_sec": 5510317.461169168,
+      "tps_ci_lo": 5496292.848992017,
+      "tps_ci_hi": 5524157.888904503,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 32768,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        11.02290431022644,
+        11.049967679977417,
+        11.110606718063355
+      ],
+      "mean_ms": 11.061159569422404,
+      "stddev_across_seeds_ms": 0.03666853216869325,
+      "ci_lo_ms": 11.040706439733505,
+      "ci_hi_ms": 11.082062059720357,
+      "tokens_per_sec": 2962438.0513037923,
+      "tps_ci_lo": 2956850.433016512,
+      "tps_ci_hi": 2967926.0270949597,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "full_sdpa",
+      "seq_len": 65536,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        43.01354164123535,
+        43.08331802368164,
+        43.42651470184326
+      ],
+      "mean_ms": 43.17445812225342,
+      "stddev_across_seeds_ms": 0.18049298300805852,
+      "ci_lo_ms": 43.133993282636006,
+      "ci_hi_ms": 43.21435844580332,
+      "tokens_per_sec": 1517934.5115213098,
+      "tps_ci_lo": 1516532.9847992782,
+      "tps_ci_hi": 1519358.515465391,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 1024,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.5117299193143845,
+        0.4990710398554802,
+        0.4961036813259125
+      ],
+      "mean_ms": 0.5023015468319257,
+      "stddev_across_seeds_ms": 0.006776034234060458,
+      "ci_lo_ms": 0.4985584001590809,
+      "ci_hi_ms": 0.5089072262048722,
+      "tokens_per_sec": 2038616.0593342527,
+      "tps_ci_lo": 2012154.5682036858,
+      "tps_ci_hi": 2053921.8668730892,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 2048,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.5039535972476006,
+        0.507644160091877,
+        0.5044246387481689
+      ],
+      "mean_ms": 0.5053407986958821,
+      "stddev_across_seeds_ms": 0.0016400356325872514,
+      "ci_lo_ms": 0.5014152527799209,
+      "ci_hi_ms": 0.5109960623532533,
+      "tokens_per_sec": 4052710.5772682764,
+      "tps_ci_lo": 4007858.6722733113,
+      "tps_ci_hi": 4084438.9727787147,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 4096,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.6134323209524155,
+        0.6212387216091156,
+        0.6075791996717453
+      ],
+      "mean_ms": 0.6140834140777588,
+      "stddev_across_seeds_ms": 0.00559544913793207,
+      "ci_lo_ms": 0.6104584346910318,
+      "ci_hi_ms": 0.6205332088222106,
+      "tokens_per_sec": 6670103.614753126,
+      "tps_ci_lo": 6600774.852605104,
+      "tps_ci_hi": 6709711.533551154,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 8192,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        0.8118620800971985,
+        0.8131295973062516,
+        0.811885758638382
+      ],
+      "mean_ms": 0.8122924786806106,
+      "stddev_across_seeds_ms": 0.0005920111842267286,
+      "ci_lo_ms": 0.8114240693598985,
+      "ci_hi_ms": 0.8132056560615698,
+      "tokens_per_sec": 10085037.366474316,
+      "tps_ci_lo": 10073712.521472875,
+      "tps_ci_hi": 10095830.662827585,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 16384,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        1.279856321811676,
+        1.2889619195461273,
+        1.2990601634979249
+      ],
+      "mean_ms": 1.289292801618576,
+      "stddev_across_seeds_ms": 0.007843425955836203,
+      "ci_lo_ms": 1.2871134670774143,
+      "ci_hi_ms": 1.2917891239126522,
+      "tokens_per_sec": 12707741.778618135,
+      "tps_ci_lo": 12683184.659718383,
+      "tps_ci_hi": 12729258.46794405,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 32768,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        2.642699522972107,
+        2.6689705657958984,
+        2.675473937988281
+      ],
+      "mean_ms": 2.6623813422520954,
+      "stddev_across_seeds_ms": 0.014168132553863299,
+      "ci_lo_ms": 2.6567968264023465,
+      "ci_hi_ms": 2.670068238914013,
+      "tokens_per_sec": 12307778.558980476,
+      "tps_ci_lo": 12272345.523771185,
+      "tps_ci_hi": 12333649.180231893,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    },
+    {
+      "impl": "nsa",
+      "seq_len": 65536,
+      "ok": true,
+      "n_seeds": 3,
+      "n_iters_per_seed": 100,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "seed_means_ms": [
+        6.021612176895141,
+        6.029826240539551,
+        6.078596816062928
+      ],
+      "mean_ms": 6.04334507783254,
+      "stddev_across_seeds_ms": 0.025151295481365462,
+      "ci_lo_ms": 6.033381401022275,
+      "ci_hi_ms": 6.053378325541814,
+      "tokens_per_sec": 10844325.312547706,
+      "tps_ci_lo": 10826351.249760047,
+      "tps_ci_hi": 10862233.902351309,
+      "ci_method": "percentile bootstrap on pooled per-iter samples",
+      "alpha": 0.05,
+      "n_boot": 10000
+    }
+  ],
+  "crossovers": [
+    {
+      "pair": "nsa vs fa3",
+      "regimes": [
+        {
+          "seq_len": 1024,
+          "verdict": "fa3 wins",
+          "nsa_tps_ci": [
+            2012154.5682036858,
+            2053921.8668730892
+          ],
+          "fa3_tps_ci": [
+            14969696.88743956,
+            15319531.893266259
+          ]
+        },
+        {
+          "seq_len": 2048,
+          "verdict": "fa3 wins",
+          "nsa_tps_ci": [
+            4007858.6722733113,
+            4084438.9727787147
+          ],
+          "fa3_tps_ci": [
+            18431426.116428856,
+            18567392.700840674
+          ]
+        },
+        {
+          "seq_len": 4096,
+          "verdict": "fa3 wins",
+          "nsa_tps_ci": [
+            6600774.852605104,
+            6709711.533551154
+          ],
+          "fa3_tps_ci": [
+            16065814.601451864,
+            16208258.0755487
+          ]
+        },
+        {
+          "seq_len": 8192,
+          "verdict": "fa3 wins",
+          "nsa_tps_ci": [
+            10073712.521472875,
+            10095830.662827585
+          ],
+          "fa3_tps_ci": [
+            10466483.408761393,
+            10602466.068432331
+          ]
+        },
+        {
+          "seq_len": 16384,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            12683184.659718383,
+            12729258.46794405
+          ],
+          "fa3_tps_ci": [
+            5675695.673231937,
+            5704499.26562374
+          ]
+        },
+        {
+          "seq_len": 32768,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            12272345.523771185,
+            12333649.180231893
+          ],
+          "fa3_tps_ci": [
+            2968902.185885438,
+            2985893.3800263642
+          ]
+        },
+        {
+          "seq_len": 65536,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            10826351.249760047,
+            10862233.902351309
+          ],
+          "fa3_tps_ci": [
+            1531185.9219464082,
+            1535990.5116934387
+          ]
+        }
+      ]
+    },
+    {
+      "pair": "nsa vs full_sdpa",
+      "regimes": [
+        {
+          "seq_len": 1024,
+          "verdict": "full_sdpa wins",
+          "nsa_tps_ci": [
+            2012154.5682036858,
+            2053921.8668730892
+          ],
+          "full_sdpa_tps_ci": [
+            30214047.717890874,
+            30381285.118774332
+          ]
+        },
+        {
+          "seq_len": 2048,
+          "verdict": "full_sdpa wins",
+          "nsa_tps_ci": [
+            4007858.6722733113,
+            4084438.9727787147
+          ],
+          "full_sdpa_tps_ci": [
+            25962540.908421945,
+            26079729.680868015
+          ]
+        },
+        {
+          "seq_len": 4096,
+          "verdict": "full_sdpa wins",
+          "nsa_tps_ci": [
+            6600774.852605104,
+            6709711.533551154
+          ],
+          "full_sdpa_tps_ci": [
+            17674355.193483405,
+            17792572.392530132
+          ]
+        },
+        {
+          "seq_len": 8192,
+          "verdict": "full_sdpa wins",
+          "nsa_tps_ci": [
+            10073712.521472875,
+            10095830.662827585
+          ],
+          "full_sdpa_tps_ci": [
+            10373296.686349308,
+            10433504.300862411
+          ]
+        },
+        {
+          "seq_len": 16384,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            12683184.659718383,
+            12729258.46794405
+          ],
+          "full_sdpa_tps_ci": [
+            5496292.848992017,
+            5524157.888904503
+          ]
+        },
+        {
+          "seq_len": 32768,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            12272345.523771185,
+            12333649.180231893
+          ],
+          "full_sdpa_tps_ci": [
+            2956850.433016512,
+            2967926.0270949597
+          ]
+        },
+        {
+          "seq_len": 65536,
+          "verdict": "nsa wins",
+          "nsa_tps_ci": [
+            10826351.249760047,
+            10862233.902351309
+          ],
+          "full_sdpa_tps_ci": [
+            1516532.9847992782,
+            1519358.515465391
+          ]
+        }
+      ]
+    }
+  ],
+  "n_seeds": 3,
+  "seed_sources": [
+    "runs/throughput_seed0.json",
+    "runs/throughput_seed1.json",
+    "runs/throughput_seed2.json"
+  ]
+}
