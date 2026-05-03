@@ -195,6 +195,22 @@ Five constraints a reader should keep in mind before quoting numbers from this p
 
 The kernel work (three Triton branches, Triton selected backward, CUDA Hopper forward, multi-precision, autotune) is complete and validated; the five-model training fleet (NSA-100M, NSA-150M, NSA-300M, dense-100M, NSA-100M-64k) ran end to end with the loss-curve and scaling-trend findings reported above; the perplexity sweep is reported for NSA-100M across both in-training-context lengths (2k - 32k) and extrapolated lengths (64k, 256k); the LongBench likelihood subset and the MoBA cross-comparison both shipped. Honest follow-ups that did not make this build: a Chinchilla-optimal retrain of the three NSA scaling points, the LongBench eval at full generation-based F1 / ROUGE scoring on every trained model, and a top-k routing-density ablation. Each requires GPU time that the kernel work and the training fleet already consumed inside the original budget. The CUDA selected backward is in the tree at the kernel level (compiles, runs cleanly under WGMMA, dispatched through the Triton bwd while the `tnsp=1` layout debug continues) and is the natural first follow-up after Triton-native sliding/compressed bwd kernels eliminate the autograd path's throughput bottleneck.
 
+## Future work
+
+Six follow-ups, in roughly the order they pay off.
+
+**Triton-native sliding and compressed backward kernels.** The single largest gap between this build and a production-quality NSA is that the compressed and sliding branches use a "Triton forward, reference autograd backward" path during training. The forward kernels are not the bottleneck; the autograd graph is, and it costs the training fleet roughly 30 to 60x against what the forward number would predict. Hand-written Triton bwd kernels for both branches should bring training throughput back to a small constant multiple of inference and unblock the CUDA selected backward, which is gated on the same dispatch path.
+
+**Int64 stride lift in the Triton kernels.** All Triton kernels currently carry int32 pointer strides; the pointer arithmetic overflows at `B*H*T*D = 2^31` and gives either silent wrong data or an illegal-memory-access crash. At T=64k H=16 D=64 the safe ceiling is batch=32, which is the reason SDPA fits 183 batches before OOM while NSA caps at 32 with 18 GB / 94 GB still free. The fix is mechanical and unrelated to the algorithm.
+
+**CUDA selected backward through-dispatch.** The kernel is in the tree (`nsa/cuda/selected_bwd.cu`), compiles cleanly, and runs under Hopper WGMMA in isolation. The blocker is the `tnsp=1` layout-debug path through the dispatcher; once the Triton-native sliding/compressed bwd kernels land and that path is the only autograd-non-aware branch, the CUDA bwd becomes the natural next dispatch target.
+
+**Chinchilla-optimal retrain of the three NSA scaling points.** Current token budgets are 1B / 1B / 500M against Chinchilla-optimal ~2B / 3B / 6B, roughly 50% / 33% / 8% of the recommended budgets. NSA-300M is the most affected and sits visibly above the scaling line in Plot 5. Retraining at full budgets would convert the "the architecture trains stably end-to-end under matched recipes" claim into a converged scaling-law statement.
+
+**LongBench at full generation-based F1 / ROUGE.** Only the likelihood-only subset ships in this build. Running the generation-based half of the suite would give comparable numbers against the published NSA report and against the MoBA cross-comparison already shipped here.
+
+**Top-k routing-density ablation.** A sweep over the number of selected blocks per query (currently fixed at the paper's default) is the missing ablation that would turn the selected-branch latency curve into a Pareto frontier rather than a single operating point.
+
 The repo: <https://github.com/qflen/nsa-from-scratch>.
 
 The NSA paper: <https://arxiv.org/abs/2502.11089>.
