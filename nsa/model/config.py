@@ -71,3 +71,15 @@ def nsa_150m() -> TransformerConfig:
         intermediate_size=2400,
         attention="nsa",
     )
+
+
+def nsa_300m() -> TransformerConfig:
+    return TransformerConfig(
+        n_layers=20,
+        n_heads=16,
+        head_dim=64,
+        hidden_size=1024,
+        intermediate_size=2752,
+        max_position_embeddings=32768,
+        attention="nsa",
+    )

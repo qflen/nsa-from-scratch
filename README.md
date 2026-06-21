@@ -43,7 +43,7 @@ Python, PyTorch, Triton, CUDA C++ (Hopper sm_90a, WGMMA inline-PTX), torch.utils
 
 ```bash
 pip install -e '.[dev,train]'
-pytest tests/ -q                              # full suite; CUDA WGMMA tests are a Hopper-only subset, skipped on non-sm_90 cards
+pytest tests/ -q                              # CPU-only runs test_reference.py alone; everything else needs CUDA (the CUDA-C++ WGMMA and FP8 tests additionally need Hopper sm_90)
 # Headline throughput is a 3-seed protocol (100 iters, 25 warmup each),
 # pooled into a 95% bootstrap CI (this is what reports 7.07x at 64k):
 for s in 0 1 2; do
@@ -56,7 +56,7 @@ python scripts/multiseed_combine.py \
     --out runs/throughput_multiseed.json
 ```
 
-The throughput benchmark needs a Hopper card (the WGMMA selected forward and the FA-3 baseline both require sm_90a). On a non-Hopper (sm_89) card the suite still runs; the Hopper-only tests skip cleanly.
+The throughput benchmark needs a Hopper card (the WGMMA selected forward and the FA-3 baseline both require sm_90a). On a non-Hopper CUDA card (sm_89) the Triton, training, and reference tests run while the CUDA-C++ WGMMA and FP8 tests skip; on a CPU-only runner (the CI `Reference tests (CPU)` job) only `tests/test_reference.py` runs and everything that needs CUDA skips.
 
 ## Reproducing the training runs
 
@@ -100,8 +100,8 @@ nsa/
   train/                train.py, data.py, config_*.yaml (NSA-100M, 150M, 300M, dense, 64k, sanity)
   eval/                 perplexity.py, long_context_probe.py, longbench.py
   bench/                throughput.py, memory.py, memory_sweep.py, correctness.py, branch_breakdown.py, autotune.py, plots.py
-tests/                  test_{compressed,selected,sliding,combined,fp8,training_step,cuda_selected,cuda_selected_bwd}_forward|backward.py
-writeup/                post.md, figures/{01..08}.png
+tests/                  test_reference, test_{compressed,selected,sliding,combined}_forward, test_selected_backward, test_{fp8,moba,training_step}, test_cuda_selected, test_cuda_selected_bwd
+writeup/                post.md, decisions/*.md, figures/{01..08}.png
 notes/                  refs.bib
 scripts/                fetch_wandb.py, make_plots.py, multiseed_combine.py
 ```
